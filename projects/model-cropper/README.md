@@ -42,11 +42,11 @@ import { ModelCropperComponent } from 'ng-three-model-cropper';
 })
 export class MyComponent {
   modelUrl = 'assets/model.glb';
-  
+
   onCropApplied(result: CropResult) {
     console.log('Crop applied:', result);
   }
-  
+
   onFileReady(buffer: ArrayBuffer) {
     // Handle exported GLB
   }
