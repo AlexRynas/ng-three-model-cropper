@@ -1,0 +1,41 @@
+<div class="demo-container">
+  <header>
+    <h1>{{ title }}</h1>
+    <p>Load a 3D model (GLB/GLTF/FBX) to test the cropper</p>
+  </header>
+
+  <div class="upload-section" *ngIf="!showCropper">
+    <label for="file-input" class="upload-button">
+      Choose 3D Model File
+      <input
+        id="file-input"
+        type="file"
+        accept=".glb,.gltf,.fbx"
+        (change)="loadModel($event)"
+        style="display: none"
+      />
+    </label>
+    <p class="hint">Supported formats: GLB, GLTF, FBX</p>
+  </div>
+
+  <div class="cropper-section" *ngIf="showCropper">
+    <ntmc-model-cropper
+      [srcUrl]="modelUrl"
+      [downloadMode]="'download'"
+      [filename]="'cropped-model.glb'"
+      (cropApplied)="onCropApplied($event)"
+      (fileReady)="onFileReady($event)"
+      (loadError)="onLoadError($event)"
+    />
+    <button class="back-button" (click)="showCropper = false; modelUrl = ''">
+      ← Load Another Model
+    </button>
+  </div>
+
+  <footer>
+    <p>
+      Built with
+      <strong>ng-three-model-cropper</strong>
+    </p>
+  </footer>
+</div>
