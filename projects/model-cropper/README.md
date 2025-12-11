@@ -7,6 +7,7 @@ Angular 17+ Three.js 3D Model Cropper Library with cheap geometry cropping.
 - **GLB/FBX Input**: Load 3D models in GLB, GLTF, or FBX format
 - **Cheap Cropping**: Triangle-pruning based cropping (no boolean CSG)
 - **GLB Export**: Export cropped models as GLB files
+- **Visual Helpers**: Configurable crop box color, grid helper, and view helper (axis indicator)
 - **Angular 17-20 Compatible**: Built with Angular 17, usable in Angular 17-20 apps
 - **Zoneless Friendly**: Signal-based state management
 - **Highly Configurable**: Template customization and label overrides
@@ -31,6 +32,9 @@ import { ModelCropperComponent } from 'ng-three-model-cropper';
     <ntmc-model-cropper
       [srcUrl]="modelUrl"
       [downloadMode]="'download'"
+      [cropBoxColor]="'#ff0000'"
+      [showGrid]="true"
+      [showViewHelper]="true"
       (cropApplied)="onCropApplied($event)"
       (fileReady)="onFileReady($event)"
     />
