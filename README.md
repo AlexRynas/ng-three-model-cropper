@@ -48,9 +48,15 @@ import { ModelCropperComponent, CropResult } from 'ng-three-model-cropper';
       (loadError)="onLoadError($event)"
     />
   `,
-  styles: [`
-    :host { display: block; width: 100%; height: 600px; }
-  `]
+  styles: [
+    `
+      :host {
+        display: block;
+        width: 100%;
+        height: 600px;
+      }
+    `,
+  ],
 })
 export class ModelEditorComponent {
   modelUrl = 'assets/models/sample.glb';
@@ -73,24 +79,24 @@ export class ModelEditorComponent {
 
 ### Inputs
 
-| Input | Type | Default | Description |
-|-------|------|---------|-------------|
-| `srcUrl` | `string` | **required** | URL to the 3D model file (GLB/GLTF/FBX) |
-| `initialCropBox` | `CropBoxConfig` | auto-calculated | Initial crop box bounds |
-| `initialTransform` | `MeshTransformConfig` | identity | Initial position/rotation |
-| `downloadMode` | `'download' \| 'emit'` | `'download'` | Export behavior |
-| `filename` | `string` | `'cropped-model.glb'` | Download filename |
-| `uiTemplate` | `TemplateRef` | - | Custom UI template |
-| `labelsConfig` | `Partial<ModelCropperLabels>` | defaults | UI label overrides |
+| Input              | Type                          | Default               | Description                             |
+| ------------------ | ----------------------------- | --------------------- | --------------------------------------- |
+| `srcUrl`           | `string`                      | **required**          | URL to the 3D model file (GLB/GLTF/FBX) |
+| `initialCropBox`   | `CropBoxConfig`               | auto-calculated       | Initial crop box bounds                 |
+| `initialTransform` | `MeshTransformConfig`         | identity              | Initial position/rotation               |
+| `downloadMode`     | `'download' \| 'emit'`        | `'download'`          | Export behavior                         |
+| `filename`         | `string`                      | `'cropped-model.glb'` | Download filename                       |
+| `uiTemplate`       | `TemplateRef`                 | -                     | Custom UI template                      |
+| `labelsConfig`     | `Partial<ModelCropperLabels>` | defaults              | UI label overrides                      |
 
 ### Outputs
 
-| Output | Type | Description |
-|--------|------|-------------|
-| `cropApplied` | `CropResult` | Emitted after cropping with statistics |
-| `fileReady` | `ArrayBuffer` | Emitted with GLB data (emit mode only) |
-| `loadError` | `string` | Emitted when model loading fails |
-| `exportError` | `string` | Emitted when export fails |
+| Output        | Type          | Description                            |
+| ------------- | ------------- | -------------------------------------- |
+| `cropApplied` | `CropResult`  | Emitted after cropping with statistics |
+| `fileReady`   | `ArrayBuffer` | Emitted with GLB data (emit mode only) |
+| `loadError`   | `string`      | Emitted when model loading fails       |
+| `exportError` | `string`      | Emitted when export fails              |
 
 ## Custom UI Template
 
@@ -99,10 +105,7 @@ Override the default UI panel with your own template:
 ```typescript
 @Component({
   template: `
-    <ntmc-model-cropper
-      [srcUrl]="modelUrl"
-      [uiTemplate]="customUI"
-    >
+    <ntmc-model-cropper [srcUrl]="modelUrl" [uiTemplate]="customUI">
       <ng-template #customUI let-ctx>
         <!-- ctx is ModelCropperUiContext -->
         <div class="my-custom-panel">
@@ -110,41 +113,37 @@ Override the default UI panel with your own template:
             [value]="ctx.cropBox.minX"
             (input)="ctx.setCropBoxValue('minX', $event.value)"
           />
-          <button mat-raised-button (click)="ctx.applyCrop()">
-            Crop Model
-          </button>
-          <button mat-button (click)="ctx.download()">
-            Export
-          </button>
+          <button mat-raised-button (click)="ctx.applyCrop()">Crop Model</button>
+          <button mat-button (click)="ctx.download()">Export</button>
         </div>
       </ng-template>
     </ntmc-model-cropper>
-  `
+  `,
 })
 export class CustomUiComponent {}
 ```
 
 ### UI Context API (`ModelCropperUiContext`)
 
-| Property/Method | Description |
-|-----------------|-------------|
-| `cropBox` | Current crop box configuration |
-| `meshTransform` | Current position/rotation values |
-| `loadingState` | `'idle' \| 'loading' \| 'loaded' \| 'error'` |
-| `errorMessage` | Error message if any |
-| `boxVisible` | Crop box visibility state |
-| `canApplyCrop` | Whether cropping is available |
-| `canExport` | Whether export is available |
-| `setCropBox(box)` | Set entire crop box |
-| `setCropBoxValue(key, value)` | Set single crop box value |
-| `setMeshTransform(transform)` | Set entire transform |
-| `setPosition(partial)` | Update position values |
-| `setRotation(partial)` | Update rotation values |
-| `toggleBoxVisibility(visible)` | Show/hide crop box |
-| `applyCrop()` | Execute cropping |
-| `download()` | Trigger export |
-| `resetCropBox()` | Reset crop box to defaults |
-| `resetTransform()` | Reset transform to identity |
+| Property/Method                | Description                                  |
+| ------------------------------ | -------------------------------------------- |
+| `cropBox`                      | Current crop box configuration               |
+| `meshTransform`                | Current position/rotation values             |
+| `loadingState`                 | `'idle' \| 'loading' \| 'loaded' \| 'error'` |
+| `errorMessage`                 | Error message if any                         |
+| `boxVisible`                   | Crop box visibility state                    |
+| `canApplyCrop`                 | Whether cropping is available                |
+| `canExport`                    | Whether export is available                  |
+| `setCropBox(box)`              | Set entire crop box                          |
+| `setCropBoxValue(key, value)`  | Set single crop box value                    |
+| `setMeshTransform(transform)`  | Set entire transform                         |
+| `setPosition(partial)`         | Update position values                       |
+| `setRotation(partial)`         | Update rotation values                       |
+| `toggleBoxVisibility(visible)` | Show/hide crop box                           |
+| `applyCrop()`                  | Execute cropping                             |
+| `download()`                   | Trigger export                               |
+| `resetCropBox()`               | Reset crop box to defaults                   |
+| `resetTransform()`             | Reset transform to identity                  |
 
 ## Using with MatDialog
 
@@ -191,7 +190,7 @@ export class AppComponent {
 })
 export class ModelCropperDialogComponent {
   result: { fileBuffer?: ArrayBuffer; cropResult?: CropResult } = {};
-  
+
   constructor(@Inject(MAT_DIALOG_DATA) public data: { modelUrl: string }) {}
 
   onFileReady(buffer: ArrayBuffer): void {
@@ -208,8 +207,12 @@ export class ModelCropperDialogComponent {
 
 ```typescript
 interface CropBoxConfig {
-  minX: number; minY: number; minZ: number;
-  maxX: number; maxY: number; maxZ: number;
+  minX: number;
+  minY: number;
+  minZ: number;
+  maxX: number;
+  maxY: number;
+  maxZ: number;
 }
 
 interface MeshTransformConfig {
@@ -272,4 +275,4 @@ npm publish
 
 ## License
 
-MIT
+Apache License 2.0
