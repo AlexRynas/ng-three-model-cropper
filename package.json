@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start:delay": "powershell -c \"Start-Sleep -Seconds 3; npm start\"",
+    "start:delay": "powershell -c \"Start-Sleep -Seconds 5; npm start\"",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

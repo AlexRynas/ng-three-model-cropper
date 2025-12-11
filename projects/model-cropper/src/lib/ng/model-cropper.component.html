@@ -46,6 +46,38 @@
             </label>
           </div>
 
+          <div class="ntmc-input-row">
+            <label for="ntmc-box-color">{{ labels().boxColorLabel }}</label>
+            <input
+              id="ntmc-box-color"
+              type="color"
+              [value]="service.cropBoxColor()"
+              (input)="onCropBoxColorChange($event)"
+            />
+          </div>
+
+          <div class="ntmc-checkbox-row ntmc-checkbox-inline">
+            <label>
+              <input
+                type="checkbox"
+                [checked]="service.gridVisible()"
+                (change)="onGridVisibilityChange($event)"
+              />
+              {{ labels().gridVisibleLabel }}
+            </label>
+          </div>
+
+          <div class="ntmc-checkbox-row ntmc-checkbox-inline">
+            <label>
+              <input
+                type="checkbox"
+                [checked]="service.viewHelperVisible()"
+                (change)="onViewHelperVisibilityChange($event)"
+              />
+              {{ labels().viewHelperVisibleLabel }}
+            </label>
+          </div>
+
           <div class="ntmc-input-grid">
             <div class="ntmc-input-row">
               <label for="ntmc-minX">{{ labels().minXLabel }}</label>

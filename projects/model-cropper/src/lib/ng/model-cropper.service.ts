@@ -34,17 +34,33 @@ export class ModelCropperService {
   private readonly _meshTransform: WritableSignal<MeshTransformConfig> =
     signal(DEFAULT_MESH_TRANSFORM);
   private readonly _boxVisible: WritableSignal<boolean> = signal(true);
+  private readonly _cropBoxColor: WritableSignal<string> = signal('#00ff00');
+  private readonly _gridVisible: WritableSignal<boolean> = signal(false);
+  private readonly _viewHelperVisible: WritableSignal<boolean> = signal(false);
   private readonly _lastCropResult: WritableSignal<CropResult | null> = signal(null);
 
   /**
    * Set initial values (must be called before initViewport)
    */
-  setInitialValues(cropBox?: CropBoxConfig, transform?: MeshTransformConfig): void {
+  setInitialValues(
+    cropBox?: CropBoxConfig,
+    transform?: MeshTransformConfig,
+    visualOptions?: { cropBoxColor?: string; showGrid?: boolean; showViewHelper?: boolean }
+  ): void {
     if (cropBox) {
       this._cropBox.set(this.roundCropBox(cropBox));
     }
     if (transform) {
       this._meshTransform.set(this.roundTransform(transform));
+    }
+    if (visualOptions?.cropBoxColor) {
+      this._cropBoxColor.set(visualOptions.cropBoxColor);
+    }
+    if (typeof visualOptions?.showGrid === 'boolean') {
+      this._gridVisible.set(visualOptions.showGrid);
+    }
+    if (typeof visualOptions?.showViewHelper === 'boolean') {
+      this._viewHelperVisible.set(visualOptions.showViewHelper);
     }
   }
 
@@ -54,6 +70,9 @@ export class ModelCropperService {
   readonly cropBox: Signal<CropBoxConfig> = this._cropBox.asReadonly();
   readonly meshTransform: Signal<MeshTransformConfig> = this._meshTransform.asReadonly();
   readonly boxVisible: Signal<boolean> = this._boxVisible.asReadonly();
+  readonly cropBoxColor: Signal<string> = this._cropBoxColor.asReadonly();
+  readonly gridVisible: Signal<boolean> = this._gridVisible.asReadonly();
+  readonly viewHelperVisible: Signal<boolean> = this._viewHelperVisible.asReadonly();
   readonly lastCropResult: Signal<CropResult | null> = this._lastCropResult.asReadonly();
 
   // Computed signals
@@ -79,6 +98,14 @@ export class ModelCropperService {
       onLoadingStateChange: (state: LoadingState) => this._loadingState.set(state),
       onError: (message: string) => this._errorMessage.set(message),
     });
+
+    // Sync visual states to engine
+    this.engine.updateCropBox(this._cropBox());
+    this.engine.setMeshTransform(this._meshTransform());
+    this.engine.setBoxVisibility(this._boxVisible());
+    this.engine.setCropBoxColor(this._cropBoxColor());
+    this.engine.setGridVisibility(this._gridVisible());
+    this.engine.setViewHelperVisibility(this._viewHelperVisible());
   }
 
   /**
@@ -128,6 +155,31 @@ export class ModelCropperService {
   toggleBoxVisibility(visible: boolean): void {
     this._boxVisible.set(visible);
     this.engine?.setBoxVisibility(visible);
+  }
+
+  /**
+   * Update crop box color (hex string like #00ff00)
+   */
+  setCropBoxColor(color: string): void {
+    const normalized = this.normalizeColor(color);
+    this._cropBoxColor.set(normalized);
+    this.engine?.setCropBoxColor(normalized);
+  }
+
+  /**
+   * Toggle grid helper visibility
+   */
+  toggleGridVisibility(visible: boolean): void {
+    this._gridVisible.set(visible);
+    this.engine?.setGridVisibility(visible);
+  }
+
+  /**
+   * Toggle view helper visibility
+   */
+  toggleViewHelperVisibility(visible: boolean): void {
+    this._viewHelperVisible.set(visible);
+    this.engine?.setViewHelperVisibility(visible);
   }
 
   /**
@@ -260,6 +312,17 @@ export class ModelCropperService {
   }
 
   /**
+   * Normalize hex color strings (fallback to default green)
+   */
+  private normalizeColor(color: string): string {
+    if (typeof color !== 'string') return '#00ff00';
+    const trimmed = color.trim();
+    const hex = trimmed.startsWith('#') ? trimmed : `#${trimmed}`;
+    const isValid = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(hex);
+    return isValid ? hex : '#00ff00';
+  }
+
+  /**
    * Get the underlying engine (for advanced use cases)
    */
   getEngine(): ModelCropEngine | null {
@@ -281,6 +344,9 @@ export class ModelCropperService {
     this._cropBox.set(DEFAULT_CROP_BOX);
     this._meshTransform.set(DEFAULT_MESH_TRANSFORM);
     this._boxVisible.set(true);
+    this._cropBoxColor.set('#00ff00');
+    this._gridVisible.set(false);
+    this._viewHelperVisible.set(false);
     this._lastCropResult.set(null);
   }
 }

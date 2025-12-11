@@ -17,6 +17,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
+import { ViewHelper } from 'three/examples/jsm/helpers/ViewHelper.js';
 
 import {
   CropBoxConfig,
@@ -58,12 +59,20 @@ export class ModelCropEngine {
   private loadedModel: THREE.Object3D | null = null;
   private cropBoxMesh: THREE.Mesh | null = null;
   private cropBoxHelper: THREE.Box3Helper | null = null;
+  private cropBoxColor: THREE.Color = new THREE.Color(0x00ff00);
+  private gridHelper: THREE.GridHelper | null = null;
+  private viewHelper: ViewHelper | null = null;
 
   // State
   private currentCropBox: CropBoxConfig = DEFAULT_CROP_BOX;
   private currentTransform: MeshTransformConfig = DEFAULT_MESH_TRANSFORM;
   private loadingState: LoadingState = 'idle';
   private boxVisible = true;
+  private gridVisible = false;
+  private viewHelperVisible = false;
+
+  // Timing
+  private clock = new THREE.Clock();
 
   // Animation
   private animationFrameId: number | null = null;
@@ -103,18 +112,23 @@ export class ModelCropEngine {
     this.renderer.setSize(hostElement.clientWidth || 100, hostElement.clientHeight || 100);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.autoClear = false; // we clear manually to overlay view helper
     hostElement.appendChild(this.renderer.domElement);
 
     // Create controls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.05;
+    this.controls.enablePan = true;
 
     // Setup lighting
     this.setupLighting();
 
     // Setup resize observer
     this.setupResizeObserver();
+
+    // Pointer handling for view helper clicking (use pointerup per official Three.js editor pattern)
+    this.renderer.domElement.addEventListener('pointerup', this.handlePointerUp);
 
     // Start render loop
     this.startRenderLoop();
@@ -129,6 +143,50 @@ export class ModelCropEngine {
   }): void {
     this.onLoadingStateChange = callbacks.onLoadingStateChange;
     this.onError = callbacks.onError;
+  }
+
+  /**
+   * Set crop box color (hex string or number)
+   */
+  setCropBoxColor(color: string | number): void {
+    this.cropBoxColor = new THREE.Color(color as THREE.ColorRepresentation);
+    this.updateCropBoxVisualization();
+  }
+
+  /**
+   * Toggle grid helper visibility
+   */
+  setGridVisibility(visible: boolean): void {
+    this.gridVisible = visible;
+    if (visible && !this.gridHelper) {
+      // 10 unit grid with 10 divisions for modest default
+      this.gridHelper = new THREE.GridHelper(10, 10, 0x555555, 0x333333);
+      this.scene.add(this.gridHelper);
+    }
+    if (this.gridHelper) {
+      this.gridHelper.visible = visible;
+    }
+  }
+
+  /**
+   * Toggle view helper visibility
+   */
+  setViewHelperVisibility(visible: boolean): void {
+    this.viewHelperVisible = visible;
+
+    if (visible && !this.viewHelper) {
+      this.viewHelper = new ViewHelper(this.camera, this.renderer.domElement);
+      // Initialize center to current controls target
+      this.viewHelper.center.copy(this.controls.target);
+    }
+
+    if (this.viewHelper) {
+      this.viewHelper.visible = visible;
+      // Reset animation state when toggling visibility
+      if (!visible) {
+        this.viewHelper.animating = false;
+      }
+    }
   }
 
   /**
@@ -182,9 +240,26 @@ export class ModelCropEngine {
     const animate = (): void => {
       if (this.isDisposed) return;
 
+      const delta = this.clock.getDelta();
       this.animationFrameId = requestAnimationFrame(animate);
+
+      // Handle view helper animation
+      if (this.viewHelper && this.viewHelper.animating) {
+        this.viewHelper.update(delta);
+        // Disable controls while animating
+        this.controls.enabled = false;
+      } else if (this.viewHelper && !this.viewHelper.animating) {
+        // Re-enable controls when not animating
+        this.controls.enabled = true;
+      }
+
       this.controls.update();
+      this.renderer.clear();
       this.renderer.render(this.scene, this.camera);
+
+      if (this.viewHelper && this.viewHelperVisible) {
+        this.viewHelper.render(this.renderer);
+      }
     };
 
     animate();
@@ -358,6 +433,10 @@ export class ModelCropEngine {
     this.controls.target.set(0, 0, 0);
     this.controls.update();
 
+    if (this.viewHelper) {
+      this.viewHelper.center.copy(this.controls.target);
+    }
+
     // Update default crop box based on model size
     const padding = 0.1;
     this.currentCropBox = {
@@ -427,7 +506,7 @@ export class ModelCropEngine {
     // Create translucent box mesh
     const geometry = new THREE.BoxGeometry(width, height, depth);
     const material = new THREE.MeshBasicMaterial({
-      color: 0x00ff00,
+      color: this.cropBoxColor,
       transparent: true,
       opacity: 0.15,
       side: THREE.DoubleSide,
@@ -448,7 +527,7 @@ export class ModelCropEngine {
       new THREE.Vector3(box.minX, box.minY, box.minZ),
       new THREE.Vector3(box.maxX, box.maxY, box.maxZ)
     );
-    this.cropBoxHelper = new THREE.Box3Helper(box3, new THREE.Color(0x00ff00));
+    this.cropBoxHelper = new THREE.Box3Helper(box3, this.cropBoxColor.clone());
     this.cropBoxHelper.visible = this.boxVisible;
     this.scene.add(this.cropBoxHelper);
   }
@@ -601,6 +680,23 @@ export class ModelCropEngine {
     // Dispose controls
     this.controls.dispose();
 
+    // Remove listeners
+    this.renderer.domElement.removeEventListener('pointerup', this.handlePointerUp);
+
+    // Dispose grid helper
+    if (this.gridHelper) {
+      this.scene.remove(this.gridHelper);
+      this.gridHelper.geometry.dispose();
+      (this.gridHelper.material as THREE.Material).dispose();
+      this.gridHelper = null;
+    }
+
+    // Dispose view helper
+    if (this.viewHelper) {
+      this.viewHelper.dispose();
+      this.viewHelper = null;
+    }
+
     // Dispose renderer
     this.renderer.dispose();
     this.renderer.domElement.remove();
@@ -608,4 +704,22 @@ export class ModelCropEngine {
     // Clear scene
     this.scene.clear();
   }
+
+  /**
+   * Handle pointer events to drive the view helper interactions
+   * Using pointerup per official Three.js editor pattern
+   */
+  private handlePointerUp = (event: PointerEvent): void => {
+    if (!this.viewHelper || !this.viewHelperVisible) return;
+
+    // Set the center to current controls target before handling click
+    // This ensures the camera orbits around the correct point
+    this.viewHelper.center.copy(this.controls.target);
+
+    const handled = this.viewHelper.handleClick(event);
+    if (handled) {
+      event.stopPropagation();
+      this.controls.enabled = false;
+    }
+  };
 }

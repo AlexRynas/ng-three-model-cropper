@@ -66,6 +66,9 @@ export class ModelCropperComponent implements AfterViewInit, OnDestroy {
   readonly filename = input<string>('cropped-model.glb');
   readonly uiTemplate = input<TemplateRef<{ $implicit: ModelCropperUiContext }>>();
   readonly labelsConfig = input<Partial<ModelCropperLabels>>({});
+  readonly cropBoxColor = input<string>('#00ff00');
+  readonly showGrid = input<boolean>(false);
+  readonly showViewHelper = input<boolean>(false);
 
   // Outputs using signal-based output()
   readonly cropApplied = output<CropResult>();
@@ -86,6 +89,9 @@ export class ModelCropperComponent implements AfterViewInit, OnDestroy {
     loadingState: this.service.loadingState(),
     errorMessage: this.service.errorMessage(),
     boxVisible: this.service.boxVisible(),
+    cropBoxColor: this.service.cropBoxColor(),
+    gridVisible: this.service.gridVisible(),
+    viewHelperVisible: this.service.viewHelperVisible(),
     canApplyCrop: this.service.canApplyCrop(),
     canExport: this.service.canExport(),
     setCropBox: (box: CropBoxConfig) => this.service.updateCropBox(box),
@@ -95,6 +101,10 @@ export class ModelCropperComponent implements AfterViewInit, OnDestroy {
     setPosition: (position) => this.service.updatePosition(position),
     setRotation: (rotation) => this.service.updateRotation(rotation),
     toggleBoxVisibility: (visible: boolean) => this.service.toggleBoxVisibility(visible),
+    setCropBoxColor: (color: string) => this.service.setCropBoxColor(color),
+    toggleGridVisibility: (visible: boolean) => this.service.toggleGridVisibility(visible),
+    toggleViewHelperVisibility: (visible: boolean) =>
+      this.service.toggleViewHelperVisibility(visible),
     applyCrop: () => this.onApplyCrop(),
     download: () => this.onDownload(),
     resetCropBox: () => this.service.resetCropBox(),
@@ -108,7 +118,11 @@ export class ModelCropperComponent implements AfterViewInit, OnDestroy {
     // This is done in constructor to read input signals once at initialization
     const initialBox = this.initialCropBox();
     const initialTrans = this.initialTransform();
-    this.service.setInitialValues(initialBox, initialTrans);
+    this.service.setInitialValues(initialBox, initialTrans, {
+      cropBoxColor: this.cropBoxColor(),
+      showGrid: this.showGrid(),
+      showViewHelper: this.showViewHelper(),
+    });
   }
 
   ngAfterViewInit(): void {
@@ -139,6 +153,21 @@ export class ModelCropperComponent implements AfterViewInit, OnDestroy {
   onBoxVisibilityChange(event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
     this.service.toggleBoxVisibility(checked);
+  }
+
+  onGridVisibilityChange(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.service.toggleGridVisibility(checked);
+  }
+
+  onViewHelperVisibilityChange(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.service.toggleViewHelperVisibility(checked);
+  }
+
+  onCropBoxColorChange(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.service.setCropBoxColor(value);
   }
 
   onCropBoxChange(key: keyof CropBoxConfig, event: Event): void {

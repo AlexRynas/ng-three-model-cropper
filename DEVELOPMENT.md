@@ -16,7 +16,7 @@ This command will:
 
 1. Build the library in production mode first
 2. Start the library in watch mode (automatically rebuilds on changes)
-3. Start the Angular dev server for the demo app (with a 3-second delay to ensure the library is ready)
+3. Start the Angular dev server for the demo app (with a 5-second delay to ensure the library is ready)
 
 The demo app will be available at: **http://localhost:4200/**
 

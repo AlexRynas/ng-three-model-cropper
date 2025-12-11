@@ -16,6 +16,9 @@ export interface ModelCropperUiContext {
   readonly loadingState: LoadingState;
   readonly errorMessage: string | null;
   readonly boxVisible: boolean;
+  readonly cropBoxColor: string;
+  readonly gridVisible: boolean;
+  readonly viewHelperVisible: boolean;
   readonly canApplyCrop: boolean;
   readonly canExport: boolean;
 
@@ -26,6 +29,9 @@ export interface ModelCropperUiContext {
   setPosition(position: Partial<Vec3>): void;
   setRotation(rotation: Partial<Vec3>): void;
   toggleBoxVisibility(visible: boolean): void;
+  setCropBoxColor(color: string): void;
+  toggleGridVisibility(visible: boolean): void;
+  toggleViewHelperVisibility(visible: boolean): void;
   applyCrop(): void;
   download(): void;
   resetCropBox(): void;
@@ -52,6 +58,9 @@ export interface ModelCropperLabels {
   readonly maxZLabel?: string;
   readonly loadingLabel?: string;
   readonly errorLabel?: string;
+  readonly boxColorLabel?: string;
+  readonly gridVisibleLabel?: string;
+  readonly viewHelperVisibleLabel?: string;
 }
 
 /**
@@ -74,4 +83,7 @@ export const DEFAULT_LABELS: Required<ModelCropperLabels> = {
   maxZLabel: 'Max Z',
   loadingLabel: 'Loading model...',
   errorLabel: 'Error loading model',
+  boxColorLabel: 'Crop Box Color',
+  gridVisibleLabel: 'Show Grid',
+  viewHelperVisibleLabel: 'Show View Helper',
 };
