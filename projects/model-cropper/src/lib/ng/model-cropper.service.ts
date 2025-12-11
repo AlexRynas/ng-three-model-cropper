@@ -41,10 +41,10 @@ export class ModelCropperService {
    */
   setInitialValues(cropBox?: CropBoxConfig, transform?: MeshTransformConfig): void {
     if (cropBox) {
-      this._cropBox.set(cropBox);
+      this._cropBox.set(this.roundCropBox(cropBox));
     }
     if (transform) {
-      this._meshTransform.set(transform);
+      this._meshTransform.set(this.roundTransform(transform));
     }
   }
 
@@ -96,7 +96,7 @@ export class ModelCropperService {
 
       // Sync crop box from engine (may have been adjusted to model size)
       const box = this.engine.getCropBox();
-      this._cropBox.set(box);
+      this._cropBox.set(this.roundCropBox(box));
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to load model';
       this._errorMessage.set(message);
@@ -108,8 +108,9 @@ export class ModelCropperService {
    * Update the crop box configuration
    */
   updateCropBox(box: CropBoxConfig): void {
-    this._cropBox.set(box);
-    this.engine?.updateCropBox(box);
+    const rounded = this.roundCropBox(box);
+    this._cropBox.set(rounded);
+    this.engine?.updateCropBox(rounded);
   }
 
   /**
@@ -133,8 +134,9 @@ export class ModelCropperService {
    * Update mesh transformation
    */
   updateTransform(transform: MeshTransformConfig): void {
-    this._meshTransform.set(transform);
-    this.engine?.setMeshTransform(transform);
+    const rounded = this.roundTransform(transform);
+    this._meshTransform.set(rounded);
+    this.engine?.setMeshTransform(rounded);
   }
 
   /**
@@ -200,13 +202,14 @@ export class ModelCropperService {
         // Re-calculate based on model bounds
         // For now, just get current from engine
         const box = this.engine.getCropBox();
-        this._cropBox.set(box);
+        this._cropBox.set(this.roundCropBox(box));
       } else {
-        this._cropBox.set(DEFAULT_CROP_BOX);
-        this.engine.updateCropBox(DEFAULT_CROP_BOX);
+        const roundedDefault = this.roundCropBox(DEFAULT_CROP_BOX);
+        this._cropBox.set(roundedDefault);
+        this.engine.updateCropBox(roundedDefault);
       }
     } else {
-      this._cropBox.set(DEFAULT_CROP_BOX);
+      this._cropBox.set(this.roundCropBox(DEFAULT_CROP_BOX));
     }
   }
 
@@ -215,6 +218,45 @@ export class ModelCropperService {
    */
   resetTransform(): void {
     this.updateTransform(DEFAULT_MESH_TRANSFORM);
+  }
+
+  /**
+   * Round a numeric value to at most two decimal places
+   */
+  private roundNumber(value: number): number {
+    return Math.round(value * 100) / 100;
+  }
+
+  /**
+   * Round all fields of the crop box
+   */
+  private roundCropBox(box: CropBoxConfig): CropBoxConfig {
+    return {
+      minX: this.roundNumber(box.minX),
+      maxX: this.roundNumber(box.maxX),
+      minY: this.roundNumber(box.minY),
+      maxY: this.roundNumber(box.maxY),
+      minZ: this.roundNumber(box.minZ),
+      maxZ: this.roundNumber(box.maxZ),
+    };
+  }
+
+  /**
+   * Round all numeric fields of the mesh transform
+   */
+  private roundTransform(transform: MeshTransformConfig): MeshTransformConfig {
+    return {
+      position: {
+        x: this.roundNumber(transform.position.x),
+        y: this.roundNumber(transform.position.y),
+        z: this.roundNumber(transform.position.z),
+      },
+      rotation: {
+        x: this.roundNumber(transform.rotation.x),
+        y: this.roundNumber(transform.rotation.y),
+        z: this.roundNumber(transform.rotation.z),
+      },
+    };
   }
 
   /**
