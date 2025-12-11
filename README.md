@@ -1,27 +1,275 @@
-# NgThreeModelCropper
+# ng-three-model-cropper
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.17.
+Angular 17+ Three.js 3D Model Cropper Library with cheap geometry cropping.
 
-## Development server
+[![npm version](https://img.shields.io/npm/v/ng-three-model-cropper.svg)](https://www.npmjs.com/package/ng-three-model-cropper)
+[![Angular](https://img.shields.io/badge/Angular-17--20-red.svg)](https://angular.io/)
+[![Three.js](https://img.shields.io/badge/Three.js-0.150+-black.svg)](https://threejs.org/)
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Overview
 
-## Code scaffolding
+A highly configurable, UI-agnostic 3D model cropper component for Angular applications. Load GLB/FBX models, define a crop box, apply "cheap" triangle-pruning cropping, and export the result as GLB.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Key Features
 
-## Build
+- **Multi-format Support**: Load GLB, GLTF, and FBX 3D models
+- **Cheap Cropping**: Triangle-pruning based cropping (no boolean CSG operations)
+- **GLB Export**: Export cropped models as binary GLB files
+- **Angular 17-20 Compatible**: Built with Angular 17, works with apps 17-20
+- **Zoneless Friendly**: Signal-based state management, no zone.js dependency
+- **Highly Configurable**: Template customization, content projection, label overrides
+- **UI Agnostic**: Works with MatDialog or any dialog/container system
+- **Partial Ivy**: Published with partial compilation for broad compatibility
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Installation
 
-## Running unit tests
+```bash
+npm install ng-three-model-cropper three
+npm install -D @types/three
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Quick Start
 
-## Running end-to-end tests
+```typescript
+import { Component } from '@angular/core';
+import { ModelCropperComponent, CropResult } from 'ng-three-model-cropper';
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+@Component({
+  selector: 'app-model-editor',
+  standalone: true,
+  imports: [ModelCropperComponent],
+  template: `
+    <ntmc-model-cropper
+      [srcUrl]="modelUrl"
+      [downloadMode]="'download'"
+      [filename]="'my-cropped-model.glb'"
+      (cropApplied)="onCropApplied($event)"
+      (fileReady)="onFileReady($event)"
+      (loadError)="onLoadError($event)"
+    />
+  `,
+  styles: [`
+    :host { display: block; width: 100%; height: 600px; }
+  `]
+})
+export class ModelEditorComponent {
+  modelUrl = 'assets/models/sample.glb';
 
-## Further help
+  onCropApplied(result: CropResult): void {
+    console.log(`Removed ${result.trianglesRemoved} triangles`);
+  }
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+  onFileReady(buffer: ArrayBuffer): void {
+    // Handle the exported GLB ArrayBuffer (e.g., upload to server)
+  }
+
+  onLoadError(message: string): void {
+    console.error('Failed to load model:', message);
+  }
+}
+```
+
+## Component API
+
+### Inputs
+
+| Input | Type | Default | Description |
+|-------|------|---------|-------------|
+| `srcUrl` | `string` | **required** | URL to the 3D model file (GLB/GLTF/FBX) |
+| `initialCropBox` | `CropBoxConfig` | auto-calculated | Initial crop box bounds |
+| `initialTransform` | `MeshTransformConfig` | identity | Initial position/rotation |
+| `downloadMode` | `'download' \| 'emit'` | `'download'` | Export behavior |
+| `filename` | `string` | `'cropped-model.glb'` | Download filename |
+| `uiTemplate` | `TemplateRef` | - | Custom UI template |
+| `labelsConfig` | `Partial<ModelCropperLabels>` | defaults | UI label overrides |
+
+### Outputs
+
+| Output | Type | Description |
+|--------|------|-------------|
+| `cropApplied` | `CropResult` | Emitted after cropping with statistics |
+| `fileReady` | `ArrayBuffer` | Emitted with GLB data (emit mode only) |
+| `loadError` | `string` | Emitted when model loading fails |
+| `exportError` | `string` | Emitted when export fails |
+
+## Custom UI Template
+
+Override the default UI panel with your own template:
+
+```typescript
+@Component({
+  template: `
+    <ntmc-model-cropper
+      [srcUrl]="modelUrl"
+      [uiTemplate]="customUI"
+    >
+      <ng-template #customUI let-ctx>
+        <!-- ctx is ModelCropperUiContext -->
+        <div class="my-custom-panel">
+          <mat-slider
+            [value]="ctx.cropBox.minX"
+            (input)="ctx.setCropBoxValue('minX', $event.value)"
+          />
+          <button mat-raised-button (click)="ctx.applyCrop()">
+            Crop Model
+          </button>
+          <button mat-button (click)="ctx.download()">
+            Export
+          </button>
+        </div>
+      </ng-template>
+    </ntmc-model-cropper>
+  `
+})
+export class CustomUiComponent {}
+```
+
+### UI Context API (`ModelCropperUiContext`)
+
+| Property/Method | Description |
+|-----------------|-------------|
+| `cropBox` | Current crop box configuration |
+| `meshTransform` | Current position/rotation values |
+| `loadingState` | `'idle' \| 'loading' \| 'loaded' \| 'error'` |
+| `errorMessage` | Error message if any |
+| `boxVisible` | Crop box visibility state |
+| `canApplyCrop` | Whether cropping is available |
+| `canExport` | Whether export is available |
+| `setCropBox(box)` | Set entire crop box |
+| `setCropBoxValue(key, value)` | Set single crop box value |
+| `setMeshTransform(transform)` | Set entire transform |
+| `setPosition(partial)` | Update position values |
+| `setRotation(partial)` | Update rotation values |
+| `toggleBoxVisibility(visible)` | Show/hide crop box |
+| `applyCrop()` | Execute cropping |
+| `download()` | Trigger export |
+| `resetCropBox()` | Reset crop box to defaults |
+| `resetTransform()` | Reset transform to identity |
+
+## Using with MatDialog
+
+```typescript
+import { MatDialog } from '@angular/material/dialog';
+import { ModelCropperComponent } from 'ng-three-model-cropper';
+
+@Component({...})
+export class AppComponent {
+  constructor(private dialog: MatDialog) {}
+
+  openCropper(): void {
+    const dialogRef = this.dialog.open(ModelCropperDialogComponent, {
+      width: '90vw',
+      height: '80vh',
+      data: { modelUrl: 'assets/model.glb' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.fileBuffer) {
+        // Handle exported GLB
+      }
+    });
+  }
+}
+
+@Component({
+  standalone: true,
+  imports: [ModelCropperComponent, MatDialogModule],
+  template: `
+    <mat-dialog-content>
+      <ntmc-model-cropper
+        [srcUrl]="data.modelUrl"
+        [downloadMode]="'emit'"
+        (fileReady)="onFileReady($event)"
+        (cropApplied)="onCropApplied($event)"
+      />
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-button [mat-dialog-close]="result">Save</button>
+    </mat-dialog-actions>
+  `
+})
+export class ModelCropperDialogComponent {
+  result: { fileBuffer?: ArrayBuffer; cropResult?: CropResult } = {};
+  
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { modelUrl: string }) {}
+
+  onFileReady(buffer: ArrayBuffer): void {
+    this.result.fileBuffer = buffer;
+  }
+
+  onCropApplied(cropResult: CropResult): void {
+    this.result.cropResult = cropResult;
+  }
+}
+```
+
+## Types
+
+```typescript
+interface CropBoxConfig {
+  minX: number; minY: number; minZ: number;
+  maxX: number; maxY: number; maxZ: number;
+}
+
+interface MeshTransformConfig {
+  position: { x: number; y: number; z: number };
+  rotation: { x: number; y: number; z: number };
+}
+
+interface CropResult {
+  success: boolean;
+  trianglesRemoved: number;
+  trianglesKept: number;
+  meshesProcessed: number;
+}
+
+type DownloadMode = 'download' | 'emit';
+type LoadingState = 'idle' | 'loading' | 'loaded' | 'error';
+```
+
+## Architecture
+
+The library is organized for multi-version compatibility:
+
+```text
+src/lib/
+├── core/                 # Framework-agnostic (Three.js only)
+│   ├── types.ts          # Interfaces and type definitions
+│   ├── ui-context.ts     # UI context interface
+│   ├── model-crop-engine.ts  # Main Three.js engine
+│   └── cheap-cropper.ts  # Triangle-pruning cropper
+└── ng/                   # Angular 17 adapter
+    ├── model-cropper.service.ts   # Angular service wrapper
+    └── model-cropper.component.ts # Standalone component
+```
+
+### Future Angular Versions
+
+The `core/` folder is framework-agnostic. To support Angular 19/20+:
+
+1. Create a new branch (e.g., `angular-20`)
+2. Update workspace to Angular 20
+3. Create `ng/adapter-angular20/` with updated components
+4. Publish as `ng-three-model-cropper@2.x` with updated peer dependencies
+
+## Build & Publish
+
+```bash
+# Build library
+ng build model-cropper --configuration production
+
+# Publish to npm
+cd dist/model-cropper
+npm publish
+```
+
+## Requirements
+
+- Angular 17-20
+- Three.js >= 0.150.0
+- TypeScript 5.x
+
+## License
+
+MIT

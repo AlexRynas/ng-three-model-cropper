@@ -1,0 +1,35 @@
+# Prettier ignore file
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.angular/
+out-tsc/
+
+# Coverage
+coverage/
+
+# IDE
+.idea/
+.vscode/
+
+# Generated files
+*.min.js
+*.min.css
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Assets
+*.ico
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.woff
+*.woff2
+*.ttf
+*.eot
