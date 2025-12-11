@@ -36,6 +36,18 @@ export class ModelCropperService {
   private readonly _boxVisible: WritableSignal<boolean> = signal(true);
   private readonly _lastCropResult: WritableSignal<CropResult | null> = signal(null);
 
+  /**
+   * Set initial values (must be called before initViewport)
+   */
+  setInitialValues(cropBox?: CropBoxConfig, transform?: MeshTransformConfig): void {
+    if (cropBox) {
+      this._cropBox.set(cropBox);
+    }
+    if (transform) {
+      this._meshTransform.set(transform);
+    }
+  }
+
   // Public readonly signals
   readonly loadingState: Signal<LoadingState> = this._loadingState.asReadonly();
   readonly errorMessage: Signal<string | null> = this._errorMessage.asReadonly();

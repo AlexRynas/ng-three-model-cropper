@@ -530,20 +530,11 @@ export class ModelCropperComponent implements AfterViewInit, OnDestroy {
   readonly service = inject(ModelCropperService);
 
   constructor() {
-    // Effect to apply initial values when they change
-    effect(() => {
-      const initialBox = this.initialCropBox();
-      if (initialBox) {
-        this.service.updateCropBox(initialBox);
-      }
-    });
-
-    effect(() => {
-      const initialTrans = this.initialTransform();
-      if (initialTrans) {
-        this.service.updateTransform(initialTrans);
-      }
-    });
+    // Set initial values before viewport initialization
+    // This is done in constructor to read input signals once at initialization
+    const initialBox = this.initialCropBox();
+    const initialTrans = this.initialTransform();
+    this.service.setInitialValues(initialBox, initialTrans);
   }
 
   ngAfterViewInit(): void {
