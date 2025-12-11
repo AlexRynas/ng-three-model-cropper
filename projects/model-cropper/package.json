@@ -1,9 +1,9 @@
 {
   "name": "ng-three-model-cropper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Angular 17+ Three.js 3D Model Cropper Library - GLB/FBX input with cheap geometry cropping",
   "author": "",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "keywords": [
     "angular",
     "threejs",
