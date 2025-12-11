@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "build:lib": "ng build model-cropper --configuration production",
-    "publish:lib": "cd dist/model-cropper && npm publish",
+    "publish:lib": "npm run build:lib && cd dist/model-cropper && npm publish",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "format": "prettier --write \"projects/**/*.{ts,html,scss,css,json}\"",
