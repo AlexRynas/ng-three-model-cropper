@@ -3,6 +3,9 @@
 Angular 17+ Three.js 3D Model Cropper Library with cheap geometry cropping.
 
 [![npm version](https://img.shields.io/npm/v/ng-three-model-cropper.svg)](https://www.npmjs.com/package/ng-three-model-cropper)
+[![npm downloads](https://img.shields.io/npm/dm/ng-three-model-cropper.svg)](https://www.npmjs.com/package/ng-three-model-cropper)
+[![CI](https://github.com/AlexRynas/ng-three-model-cropper/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexRynas/ng-three-model-cropper/actions/workflows/ci.yml)
+[![License](https://img.shields.io/npm/l/ng-three-model-cropper.svg)](https://github.com/AlexRynas/ng-three-model-cropper/blob/main/LICENSE)
 [![Angular](https://img.shields.io/badge/Angular-17--20-red.svg)](https://angular.io/)
 [![Three.js](https://img.shields.io/badge/Three.js-0.150+-black.svg)](https://threejs.org/)
 

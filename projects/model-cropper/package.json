@@ -2,18 +2,34 @@
   "name": "ng-three-model-cropper",
   "version": "1.2.0",
   "description": "Angular 17+ Three.js 3D Model Cropper Library - GLB/FBX input with cheap geometry cropping",
-  "author": "",
+  "author": "Alex Rynas",
   "license": "Apache-2.0",
   "keywords": [
     "angular",
     "threejs",
+    "three.js",
     "3d",
     "model",
     "cropper",
     "glb",
     "fbx",
-    "gltf"
+    "gltf",
+    "webgl",
+    "geometry-processing",
+    "mesh-cropping",
+    "triangle-pruning",
+    "3d-viewer",
+    "angular-library",
+    "3d-cropper"
   ],
+  "homepage": "https://github.com/AlexRynas/ng-three-model-cropper#readme",
+  "bugs": {
+    "url": "https://github.com/AlexRynas/ng-three-model-cropper/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexRynas/ng-three-model-cropper.git"
+  },
   "peerDependencies": {
     "@angular/common": ">=17.0.0 <21.0.0",
     "@angular/core": ">=17.0.0 <21.0.0",
@@ -22,9 +38,5 @@
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false,
-  "repository": {
-    "type": "git",
-    "url": ""
-  }
+  "sideEffects": false
 }
