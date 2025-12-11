@@ -193,8 +193,11 @@ export class ModelCropEngine {
   /**
    * Load a 3D model from URL
    */
-  async loadModel(srcUrl: string): Promise<THREE.Object3D> {
+  async loadModel(src: string | Blob | File): Promise<THREE.Object3D> {
     this.setLoadingState('loading');
+
+    // Resolve source to a URL the loaders can consume (supports plain URL, Blob URL, File, or Blob)
+    const { url, fileType, revokeUrl } = await this.resolveModelSource(src);
 
     try {
       // Remove existing model
@@ -204,19 +207,19 @@ export class ModelCropEngine {
         this.loadedModel = null;
       }
 
-      const fileType = getModelFileType(srcUrl);
       let model: THREE.Object3D;
 
       switch (fileType) {
         case 'glb':
         case 'gltf':
-          model = await this.loadGLTF(srcUrl);
+          model = await this.loadGLTF(url);
           break;
         case 'fbx':
-          model = await this.loadFBX(srcUrl);
+          model = await this.loadFBX(url);
           break;
         default:
-          throw new Error(`Unsupported file type: ${srcUrl}`);
+          // Fallback to GLTF loader for unknown sources (e.g., Blob URLs without extensions)
+          model = await this.loadGLTF(url);
       }
 
       this.loadedModel = model;
@@ -238,7 +241,69 @@ export class ModelCropEngine {
       const message = error instanceof Error ? error.message : 'Unknown error loading model';
       this.onError?.(message);
       throw error;
+    } finally {
+      revokeUrl?.();
     }
+  }
+
+  /**
+   * Normalize incoming source (URL, Blob URL, File, Blob) into a loader-friendly URL and detected type
+   */
+  private async resolveModelSource(src: string | Blob | File): Promise<{
+    url: string;
+    fileType: ReturnType<typeof getModelFileType>;
+    revokeUrl?: () => void;
+  }> {
+    // Plain URL string (non-blob)
+    if (typeof src === 'string' && !src.startsWith('blob:')) {
+      return { url: src, fileType: getModelFileType(src) };
+    }
+
+    // File instance carries a name and mime type
+    if (src instanceof File) {
+      const fileType = this.inferFileType(src.name, src.type);
+      const objectUrl = URL.createObjectURL(src);
+      return { url: objectUrl, fileType, revokeUrl: () => URL.revokeObjectURL(objectUrl) };
+    }
+
+    // Blob instance or blob URL string
+    const blob: Blob = src instanceof Blob ? src : await this.fetchBlobFromUrl(src);
+    const inferredType = this.inferFileType(undefined, blob.type);
+    const objectUrl = URL.createObjectURL(blob);
+    return {
+      url: objectUrl,
+      fileType: inferredType,
+      revokeUrl: () => URL.revokeObjectURL(objectUrl),
+    };
+  }
+
+  /**
+   * Infer model file type from optional filename and MIME type
+   */
+  private inferFileType(filename?: string, mimeType?: string): ReturnType<typeof getModelFileType> {
+    if (filename) {
+      const byName = getModelFileType(filename);
+      if (byName !== 'unknown') return byName;
+    }
+
+    if (mimeType) {
+      const lower = mimeType.toLowerCase();
+      if (lower.includes('fbx')) return 'fbx';
+      if (lower.includes('gltf') || lower.includes('glb')) return 'glb';
+    }
+
+    return 'unknown';
+  }
+
+  /**
+   * Fetches a Blob from a blob: URL
+   */
+  private async fetchBlobFromUrl(url: string): Promise<Blob> {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch blob source: ${response.status} ${response.statusText}`);
+    }
+    return response.blob();
   }
 
   /**
