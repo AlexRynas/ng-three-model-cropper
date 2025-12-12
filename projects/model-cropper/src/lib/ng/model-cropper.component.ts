@@ -16,6 +16,7 @@ import {
   ElementRef,
   ViewChild,
   AfterViewInit,
+  OnInit,
   OnDestroy,
   TemplateRef,
   ChangeDetectionStrategy,
@@ -52,7 +53,7 @@ import { ModelCropperService } from './model-cropper.service';
   templateUrl: './model-cropper.component.html',
   styleUrls: ['./model-cropper.component.scss'],
 })
-export class ModelCropperComponent implements AfterViewInit, OnDestroy {
+export class ModelCropperComponent implements OnInit, AfterViewInit, OnDestroy {
   // ViewChild for viewport element
   @ViewChild('viewport', { static: true })
   private viewportRef!: ElementRef<HTMLDivElement>;
@@ -112,9 +113,8 @@ export class ModelCropperComponent implements AfterViewInit, OnDestroy {
 
   readonly service = inject(ModelCropperService);
 
-  constructor() {
-    // Set initial values before viewport initialization
-    // This is done in constructor to read input signals once at initialization
+  ngOnInit(): void {
+    // Set initial values from inputs
     const initialBox = this.initialCropBox();
     const initialTrans = this.initialTransform();
     this.service.setInitialValues(initialBox, initialTrans, {

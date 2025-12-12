@@ -23,9 +23,13 @@
       [srcUrl]="modelUrl"
       [downloadMode]="'download'"
       [filename]="'cropped-model.glb'"
+      [showGrid]="true"
+      [showViewHelper]="true"
+      [cropBoxColor]="'#00ff00'"
       (cropApplied)="onCropApplied($event)"
       (fileReady)="onFileReady($event)"
       (loadError)="onLoadError($event)"
+      (exportError)="onExportError($event)"
     />
     <button class="back-button" (click)="showCropper = false; modelUrl = ''">
       ← Load Another Model

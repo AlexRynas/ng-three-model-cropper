@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.2] - 2025-12-12
+
+### Fixed
+
+- Refactored `ModelCropperComponent` lifecycle to use `ngOnInit()` instead of constructor for initialization
+- Reorganized test structure to properly separate "Component Creation" and "Lifecycle Hooks" test suites in `model-cropper.component.spec.ts`
+
+### Changed
+
+- Demo app now showcases `showGrid`, `showViewHelper`, and `cropBoxColor` inputs
+- Added `exportError` event handler to demo app for better error handling examples
+
 ## [1.3.1] - 2025-12-12
 
 ### Fixed

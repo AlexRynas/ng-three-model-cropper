@@ -175,13 +175,19 @@ describe('ModelCropperComponent', () => {
       expect(viewport).toBeTruthy();
     });
 
-    it('should call setInitialValues in constructor', () => {
+    it('should have a viewport element', () => {
       fixture.detectChanges();
-      expect(mockService.setInitialValues).toHaveBeenCalled();
+      const viewport = fixture.debugElement.query(By.css('.ntmc-viewport'));
+      expect(viewport).toBeTruthy();
     });
   });
 
   describe('Lifecycle Hooks', () => {
+    it('should call setInitialValues in ngOnInit', () => {
+      fixture.detectChanges();
+      expect(mockService.setInitialValues).toHaveBeenCalled();
+    });
+
     it('should call initViewport in ngAfterViewInit', () => {
       fixture.detectChanges();
       expect(mockService.initViewport).toHaveBeenCalled();

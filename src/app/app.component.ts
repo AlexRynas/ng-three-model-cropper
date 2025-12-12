@@ -39,4 +39,9 @@ export class AppComponent {
     console.error('Model load error:', error);
     alert('Failed to load model: ' + error.message);
   }
+
+  onExportError(error: any) {
+    console.error('Model export error:', error);
+    alert('Failed to export model: ' + error.message);
+  }
 }
