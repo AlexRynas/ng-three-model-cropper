@@ -12,6 +12,8 @@
     "watch:lib": "ng build model-cropper --watch --configuration development",
     "dev": "npm run build:lib && concurrently \"npm run watch:lib\" \"npm run start:delay\" --names \"LIB,APP\" --prefix-colors \"blue,green\"",
     "publish:lib": "npm run build:lib && cd dist/model-cropper && npm publish",
+    "test:lib": "ng test model-cropper --browsers=ChromeHeadless --watch=false",
+    "test:lib:watch": "ng test model-cropper",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "format": "prettier --write \"projects/**/*.{ts,html,scss,css,json}\"",

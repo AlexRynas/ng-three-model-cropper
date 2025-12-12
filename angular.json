@@ -106,8 +106,11 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
+            "karmaConfig": "projects/model-cropper/karma.conf.js",
             "tsConfig": "projects/model-cropper/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "polyfills": ["zone.js", "zone.js/testing"],
+            "codeCoverage": true,
+            "codeCoverageExclude": ["projects/model-cropper/**/*.spec.ts"]
           }
         },
         "lint": {

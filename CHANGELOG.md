@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2024-12-12
+
+### Added
+
+- Comprehensive unit test suite with 241 tests covering:
+  - Core types and utility functions (`types.spec.ts`)
+  - CheapCropper triangle pruning logic (`cheap-cropper.spec.ts`)
+  - UI context and labels (`ui-context.spec.ts`)
+  - ModelCropEngine Three.js service (`model-crop-engine.spec.ts`)
+  - ModelCropperService Angular adapter (`model-cropper.service.spec.ts`)
+  - ModelCropperComponent Angular component (`model-cropper.component.spec.ts`)
+- Test runner npm scripts: `test:lib` and `test:lib:watch`
+
 ## [1.2.0] - 2024-12-11
 
 ### Added

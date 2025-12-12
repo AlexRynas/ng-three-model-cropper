@@ -5,6 +5,7 @@ Angular 17+ Three.js 3D Model Cropper Library with cheap geometry cropping.
 [![npm version](https://img.shields.io/npm/v/ng-three-model-cropper.svg)](https://www.npmjs.com/package/ng-three-model-cropper)
 [![npm downloads](https://img.shields.io/npm/dm/ng-three-model-cropper.svg)](https://www.npmjs.com/package/ng-three-model-cropper)
 [![CI](https://github.com/AlexRynas/ng-three-model-cropper/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexRynas/ng-three-model-cropper/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/AlexRynas/ng-three-model-cropper/branch/main/graph/badge.svg)](https://codecov.io/gh/AlexRynas/ng-three-model-cropper)
 [![License](https://img.shields.io/npm/l/ng-three-model-cropper.svg)](https://github.com/AlexRynas/ng-three-model-cropper/blob/main/LICENSE)
 [![Angular](https://img.shields.io/badge/Angular-17--20-red.svg)](https://angular.io/)
 [![Three.js](https://img.shields.io/badge/Three.js-0.150+-black.svg)](https://threejs.org/)
@@ -258,6 +259,23 @@ src/lib/
 └── ng/                   # Angular 17 adapter
     ├── model-cropper.service.ts   # Angular service wrapper
     └── model-cropper.component.ts # Standalone component
+```
+
+## Testing
+
+The library includes a comprehensive test suite covering all modules. Code coverage is tracked via [Codecov](https://codecov.io/gh/AlexRynas/ng-three-model-cropper).
+
+### Running Tests
+
+```bash
+# Run library tests (headless, single run)
+npm run test:lib
+
+# Run library tests (watch mode for development)
+npm run test:lib:watch
+
+# Run demo app tests
+npm test
 ```
 
 ### Future Angular Versions

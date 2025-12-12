@@ -10,10 +10,17 @@
       "url": "http://localhost:4200/"
     },
     {
-      "name": "ng test",
+      "name": "ng test (app)",
       "type": "chrome",
       "request": "launch",
       "preLaunchTask": "npm: test",
+      "url": "http://localhost:9876/debug.html"
+    },
+    {
+      "name": "ng test (library)",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "npm: test:lib:watch",
       "url": "http://localhost:9876/debug.html"
     }
   ]
