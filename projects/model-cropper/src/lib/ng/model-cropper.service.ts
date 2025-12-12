@@ -12,11 +12,23 @@ import {
   CropBoxConfig,
   MeshTransformConfig,
   LoadingState,
+  LoadingProgress,
   CropResult,
   DEFAULT_CROP_BOX,
   DEFAULT_MESH_TRANSFORM,
 } from '../core/types';
 import { ModelCropEngine } from '../core/model-crop-engine';
+
+/**
+ * Default loading progress state
+ */
+const DEFAULT_LOADING_PROGRESS: LoadingProgress = {
+  state: 'idle',
+  percentage: 0,
+  loaded: 0,
+  total: 0,
+  message: '',
+};
 
 /**
  * Angular adapter service for the 3D model cropper
@@ -29,6 +41,8 @@ export class ModelCropperService {
 
   // State signals
   private readonly _loadingState: WritableSignal<LoadingState> = signal('idle');
+  private readonly _loadingProgress: WritableSignal<LoadingProgress> =
+    signal(DEFAULT_LOADING_PROGRESS);
   private readonly _errorMessage: WritableSignal<string | null> = signal(null);
   private readonly _cropBox: WritableSignal<CropBoxConfig> = signal(DEFAULT_CROP_BOX);
   private readonly _meshTransform: WritableSignal<MeshTransformConfig> =
@@ -67,6 +81,7 @@ export class ModelCropperService {
 
   // Public readonly signals
   readonly loadingState: Signal<LoadingState> = this._loadingState.asReadonly();
+  readonly loadingProgress: Signal<LoadingProgress> = this._loadingProgress.asReadonly();
   readonly errorMessage: Signal<string | null> = this._errorMessage.asReadonly();
   readonly cropBox: Signal<CropBoxConfig> = this._cropBox.asReadonly();
   readonly meshTransform: Signal<MeshTransformConfig> = this._meshTransform.asReadonly();
@@ -99,8 +114,29 @@ export class ModelCropperService {
 
     // Set up callbacks for state synchronization
     this.engine.setCallbacks({
-      onLoadingStateChange: (state: LoadingState) => this._loadingState.set(state),
+      onLoadingStateChange: (state: LoadingState) => {
+        this._loadingState.set(state);
+        // Update progress state when loading state changes
+        if (state === 'loaded') {
+          this._loadingProgress.set({
+            state: 'loaded',
+            percentage: 100,
+            loaded: this._loadingProgress().total || 0,
+            total: this._loadingProgress().total || 0,
+            message: 'Model loaded successfully',
+          });
+        } else if (state === 'error') {
+          this._loadingProgress.set({
+            ...this._loadingProgress(),
+            state: 'error',
+            message: 'Failed to load model',
+          });
+        } else if (state === 'idle') {
+          this._loadingProgress.set(DEFAULT_LOADING_PROGRESS);
+        }
+      },
       onError: (message: string) => this._errorMessage.set(message),
+      onProgress: (progress: LoadingProgress) => this._loadingProgress.set(progress),
     });
 
     // Sync visual states to engine
@@ -352,6 +388,7 @@ export class ModelCropperService {
 
     // Reset state
     this._loadingState.set('idle');
+    this._loadingProgress.set(DEFAULT_LOADING_PROGRESS);
     this._errorMessage.set(null);
     this._cropBox.set(DEFAULT_CROP_BOX);
     this._meshTransform.set(DEFAULT_MESH_TRANSFORM);

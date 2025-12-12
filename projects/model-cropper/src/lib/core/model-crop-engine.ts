@@ -25,6 +25,7 @@ import {
   ModelCropEngineConfig,
   CropResult,
   LoadingState,
+  LoadingProgress,
   DEFAULT_CROP_BOX,
   DEFAULT_MESH_TRANSFORM,
   getModelFileType,
@@ -84,6 +85,7 @@ export class ModelCropEngine {
   // Callbacks for state changes
   private onLoadingStateChange?: StateChangeCallback<LoadingState>;
   private onError?: StateChangeCallback<string>;
+  private onProgress?: StateChangeCallback<LoadingProgress>;
 
   constructor(hostElement: HTMLElement, config: ModelCropEngineConfig = {}) {
     this.hostElement = hostElement;
@@ -140,9 +142,11 @@ export class ModelCropEngine {
   setCallbacks(callbacks: {
     onLoadingStateChange?: StateChangeCallback<LoadingState>;
     onError?: StateChangeCallback<string>;
+    onProgress?: StateChangeCallback<LoadingProgress>;
   }): void {
     this.onLoadingStateChange = callbacks.onLoadingStateChange;
     this.onError = callbacks.onError;
+    this.onProgress = callbacks.onProgress;
   }
 
   /**
@@ -390,7 +394,7 @@ export class ModelCropEngine {
       loader.load(
         url,
         (gltf) => resolve(gltf.scene),
-        undefined,
+        (progress) => this.handleLoadProgress(progress, 'Loading GLTF/GLB model...'),
         (error) => reject(error)
       );
     });
@@ -405,9 +409,24 @@ export class ModelCropEngine {
       loader.load(
         url,
         (fbx) => resolve(fbx),
-        undefined,
+        (progress) => this.handleLoadProgress(progress, 'Loading FBX model...'),
         (error) => reject(error)
       );
+    });
+  }
+
+  /**
+   * Handle loading progress and emit progress callback
+   */
+  private handleLoadProgress(progress: ProgressEvent, message: string): void {
+    const percentage =
+      progress.total > 0 ? Math.round((progress.loaded / progress.total) * 100) : 0;
+    this.onProgress?.({
+      state: 'loading',
+      percentage,
+      loaded: progress.loaded,
+      total: progress.total,
+      message,
     });
   }
 

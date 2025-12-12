@@ -84,27 +84,32 @@ export class ModelEditorComponent {
 
 ### Inputs
 
-| Input              | Type                          | Default               | Description                             |
-| ------------------ | ----------------------------- | --------------------- | --------------------------------------- |
-| `srcUrl`           | `string`                      | **required**          | URL to the 3D model file (GLB/GLTF/FBX) |
-| `initialCropBox`   | `CropBoxConfig`               | auto-calculated       | Initial crop box bounds                 |
-| `initialTransform` | `MeshTransformConfig`         | identity              | Initial position/rotation               |
-| `downloadMode`     | `'download' \| 'emit'`        | `'download'`          | Export behavior                         |
-| `filename`         | `string`                      | `'cropped-model.glb'` | Download filename                       |
-| `cropBoxColor`     | `string`                      | `'#00ff00'`           | Hex color for crop box visualization    |
-| `showGrid`         | `boolean`                     | `false`               | Show grid helper in the scene           |
-| `showViewHelper`   | `boolean`                     | `false`               | Show view helper (axis indicator)       |
-| `uiTemplate`       | `TemplateRef`                 | -                     | Custom UI template                      |
-| `labelsConfig`     | `Partial<ModelCropperLabels>` | defaults              | UI label overrides                      |
+| Input                 | Type                          | Default               | Description                             |
+| --------------------- | ----------------------------- | --------------------- | --------------------------------------- |
+| `srcUrl`              | `string`                      | **required**          | URL to the 3D model file (GLB/GLTF/FBX) |
+| `initialCropBox`      | `CropBoxConfig`               | auto-calculated       | Initial crop box bounds                 |
+| `initialTransform`    | `MeshTransformConfig`         | identity              | Initial position/rotation               |
+| `downloadMode`        | `'download' \| 'emit'`        | `'download'`          | Export behavior                         |
+| `filename`            | `string`                      | `'cropped-model.glb'` | Download filename                       |
+| `cropBoxColor`        | `string`                      | `'#00ff00'`           | Hex color for crop box visualization    |
+| `showGrid`            | `boolean`                     | `false`               | Show grid helper in the scene           |
+| `showViewHelper`      | `boolean`                     | `false`               | Show view helper (axis indicator)       |
+| `showLoadingOverlay`  | `boolean`                     | `true`                | Show the loading overlay with spinner   |
+| `showErrorOverlay`    | `boolean`                     | `true`                | Show the error overlay                  |
+| `showLoadingProgress` | `boolean`                     | `true`                | Show loading progress percentage        |
+| `spinnerColor`        | `string`                      | `'#4caf50'`           | Hex color for the loading spinner       |
+| `uiTemplate`          | `TemplateRef`                 | -                     | Custom UI template                      |
+| `labelsConfig`        | `Partial<ModelCropperLabels>` | defaults              | UI label overrides                      |
 
 ### Outputs
 
-| Output        | Type          | Description                            |
-| ------------- | ------------- | -------------------------------------- |
-| `cropApplied` | `CropResult`  | Emitted after cropping with statistics |
-| `fileReady`   | `ArrayBuffer` | Emitted with GLB data (emit mode only) |
-| `loadError`   | `string`      | Emitted when model loading fails       |
-| `exportError` | `string`      | Emitted when export fails              |
+| Output                  | Type              | Description                            |
+| ----------------------- | ----------------- | -------------------------------------- |
+| `cropApplied`           | `CropResult`      | Emitted after cropping with statistics |
+| `fileReady`             | `ArrayBuffer`     | Emitted with GLB data (emit mode only) |
+| `loadError`             | `string`          | Emitted when model loading fails       |
+| `exportError`           | `string`          | Emitted when export fails              |
+| `loadingProgressChange` | `LoadingProgress` | Emitted during model loading progress  |
 
 ## Custom UI Template
 
@@ -138,6 +143,7 @@ export class CustomUiComponent {}
 | `cropBox`                             | Current crop box configuration                       |
 | `meshTransform`                       | Current position/rotation values                     |
 | `loadingState`                        | `'idle' \| 'loading' \| 'loaded' \| 'error'`         |
+| `loadingProgress`                     | Detailed loading progress information                |
 | `errorMessage`                        | Error message if any                                 |
 | `boxVisible`                          | Crop box visibility state                            |
 | `cropBoxColor`                        | Current crop box color (hex string)                  |
@@ -239,6 +245,14 @@ interface CropResult {
   trianglesRemoved: number;
   trianglesKept: number;
   meshesProcessed: number;
+}
+
+interface LoadingProgress {
+  state: LoadingState;
+  percentage: number;
+  loaded: number;
+  total: number;
+  message: string;
 }
 
 type DownloadMode = 'download' | 'emit';

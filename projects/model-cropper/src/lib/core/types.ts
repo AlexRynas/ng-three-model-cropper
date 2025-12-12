@@ -46,6 +46,23 @@ export type DownloadMode = 'download' | 'emit';
 export type LoadingState = 'idle' | 'loading' | 'loaded' | 'error';
 
 /**
+ * Loading progress information
+ * Provides detailed progress tracking during model loading
+ */
+export interface LoadingProgress {
+  /** Current loading state */
+  readonly state: LoadingState;
+  /** Loading progress percentage (0-100) */
+  readonly percentage: number;
+  /** Number of bytes loaded */
+  readonly loaded: number;
+  /** Total bytes to load (may be 0 if unknown) */
+  readonly total: number;
+  /** Human-readable status message */
+  readonly message: string;
+}
+
+/**
  * Model file type determined by extension
  */
 export type ModelFileType = 'glb' | 'gltf' | 'fbx' | 'unknown';

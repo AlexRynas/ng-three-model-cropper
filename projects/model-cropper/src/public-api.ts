@@ -12,6 +12,7 @@ export {
   MeshTransformConfig,
   DownloadMode,
   LoadingState,
+  LoadingProgress,
   ModelFileType,
   CropResult,
   Vec3,

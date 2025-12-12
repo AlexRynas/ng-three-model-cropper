@@ -13,6 +13,7 @@ import {
   CropBoxConfig,
   MeshTransformConfig,
   CropResult,
+  LoadingProgress,
   DEFAULT_CROP_BOX,
   DEFAULT_MESH_TRANSFORM,
 } from '../core/types';
@@ -119,6 +120,13 @@ describe('ModelCropperComponent', () => {
         cropBox: signal(DEFAULT_CROP_BOX),
         meshTransform: signal(DEFAULT_MESH_TRANSFORM),
         loadingState: signal('idle' as const),
+        loadingProgress: signal({
+          state: 'idle',
+          percentage: 0,
+          loaded: 0,
+          total: 0,
+          message: '',
+        } as LoadingProgress),
         errorMessage: signal(null as string | null),
         boxVisible: signal(true),
         cropBoxColor: signal('#00ff00'),
@@ -273,6 +281,50 @@ describe('ModelCropperComponent', () => {
       fixture.componentRef.setInput('labelsConfig', customLabels);
       fixture.detectChanges();
       expect(component.labelsConfig()).toEqual(customLabels);
+    });
+
+    it('should accept showLoadingOverlay input', () => {
+      fixture.componentRef.setInput('showLoadingOverlay', false);
+      fixture.detectChanges();
+      expect(component.showLoadingOverlay()).toBe(false);
+    });
+
+    it('should have showLoadingOverlay default to true', () => {
+      fixture.detectChanges();
+      expect(component.showLoadingOverlay()).toBe(true);
+    });
+
+    it('should accept showErrorOverlay input', () => {
+      fixture.componentRef.setInput('showErrorOverlay', false);
+      fixture.detectChanges();
+      expect(component.showErrorOverlay()).toBe(false);
+    });
+
+    it('should have showErrorOverlay default to true', () => {
+      fixture.detectChanges();
+      expect(component.showErrorOverlay()).toBe(true);
+    });
+
+    it('should accept showLoadingProgress input', () => {
+      fixture.componentRef.setInput('showLoadingProgress', false);
+      fixture.detectChanges();
+      expect(component.showLoadingProgress()).toBe(false);
+    });
+
+    it('should have showLoadingProgress default to true', () => {
+      fixture.detectChanges();
+      expect(component.showLoadingProgress()).toBe(true);
+    });
+
+    it('should accept spinnerColor input', () => {
+      fixture.componentRef.setInput('spinnerColor', '#ff5500');
+      fixture.detectChanges();
+      expect(component.spinnerColor()).toBe('#ff5500');
+    });
+
+    it('should have spinnerColor default to green', () => {
+      fixture.detectChanges();
+      expect(component.spinnerColor()).toBe('#4caf50');
     });
   });
 
@@ -521,6 +573,51 @@ describe('ModelCropperComponent', () => {
       const overlay = fixture.debugElement.query(By.css('.ntmc-loading-overlay'));
       expect(overlay).toBeFalsy();
     });
+
+    it('should hide loading overlay when showLoadingOverlay is false even when loading', () => {
+      fixture.componentRef.setInput('showLoadingOverlay', false);
+      (mockService.isLoading as unknown as ReturnType<typeof signal>).set(true);
+      fixture.detectChanges();
+
+      const overlay = fixture.debugElement.query(By.css('.ntmc-loading-overlay'));
+      expect(overlay).toBeFalsy();
+    });
+
+    it('should show progress bar when showLoadingProgress is true', () => {
+      fixture.componentRef.setInput('showLoadingProgress', true);
+      (mockService.isLoading as unknown as ReturnType<typeof signal>).set(true);
+      (mockService.loadingProgress as unknown as ReturnType<typeof signal>).set({
+        state: 'loading',
+        percentage: 50,
+        loaded: 500000,
+        total: 1000000,
+        message: 'Loading...',
+      });
+      fixture.detectChanges();
+
+      const progressBar = fixture.debugElement.query(By.css('.ntmc-progress-container'));
+      expect(progressBar).toBeTruthy();
+    });
+
+    it('should hide progress bar when showLoadingProgress is false', () => {
+      fixture.componentRef.setInput('showLoadingProgress', false);
+      (mockService.isLoading as unknown as ReturnType<typeof signal>).set(true);
+      fixture.detectChanges();
+
+      const progressBar = fixture.debugElement.query(By.css('.ntmc-progress-container'));
+      expect(progressBar).toBeFalsy();
+    });
+
+    it('should apply custom spinner color', () => {
+      fixture.componentRef.setInput('spinnerColor', '#ff5500');
+      (mockService.isLoading as unknown as ReturnType<typeof signal>).set(true);
+      fixture.detectChanges();
+
+      const spinner = fixture.debugElement.query(By.css('.ntmc-spinner'));
+      expect(spinner).toBeTruthy();
+      const spinnerEl = spinner.nativeElement as HTMLElement;
+      expect(spinnerEl.style.borderTopColor).toBe('rgb(255, 85, 0)');
+    });
   });
 
   describe('Error State UI', () => {
@@ -535,6 +632,16 @@ describe('ModelCropperComponent', () => {
 
     it('should hide error overlay when no error', () => {
       (mockService.hasError as unknown as ReturnType<typeof signal>).set(false);
+      fixture.detectChanges();
+
+      const overlay = fixture.debugElement.query(By.css('.ntmc-error-overlay'));
+      expect(overlay).toBeFalsy();
+    });
+
+    it('should hide error overlay when showErrorOverlay is false even when has error', () => {
+      fixture.componentRef.setInput('showErrorOverlay', false);
+      (mockService.hasError as unknown as ReturnType<typeof signal>).set(true);
+      (mockService.errorMessage as unknown as ReturnType<typeof signal>).set('Test error');
       fixture.detectChanges();
 
       const overlay = fixture.debugElement.query(By.css('.ntmc-error-overlay'));

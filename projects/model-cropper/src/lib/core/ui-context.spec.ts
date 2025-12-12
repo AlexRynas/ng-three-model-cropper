@@ -3,7 +3,7 @@
  */
 
 import { ModelCropperUiContext, ModelCropperLabels, DEFAULT_LABELS } from './ui-context';
-import { CropBoxConfig, MeshTransformConfig, LoadingState } from './types';
+import { CropBoxConfig, MeshTransformConfig, LoadingState, LoadingProgress } from './types';
 
 describe('ui-context', () => {
   describe('DEFAULT_LABELS', () => {
@@ -142,6 +142,13 @@ describe('ui-context', () => {
         cropBox: mockCropBox,
         meshTransform: mockTransform,
         loadingState: 'idle',
+        loadingProgress: {
+          state: 'idle',
+          percentage: 0,
+          loaded: 0,
+          total: 0,
+          message: '',
+        },
         errorMessage: null,
         boxVisible: true,
         cropBoxColor: '#00ff00',
@@ -361,6 +368,7 @@ function createMockUiContext(
     cropBox: CropBoxConfig;
     meshTransform: MeshTransformConfig;
     loadingState: LoadingState;
+    loadingProgress: LoadingProgress;
     errorMessage: string | null;
     boxVisible: boolean;
     cropBoxColor: string;
@@ -388,6 +396,13 @@ function createMockUiContext(
     cropBox: overrides.cropBox ?? defaultCropBox,
     meshTransform: overrides.meshTransform ?? defaultTransform,
     loadingState: overrides.loadingState ?? 'idle',
+    loadingProgress: overrides.loadingProgress ?? {
+      state: 'idle',
+      percentage: 0,
+      loaded: 0,
+      total: 0,
+      message: '',
+    },
     errorMessage: overrides.errorMessage ?? null,
     boxVisible: overrides.boxVisible ?? true,
     cropBoxColor: overrides.cropBoxColor ?? '#00ff00',

@@ -25,6 +25,7 @@ import {
   computed,
   Signal,
   inject,
+  effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -34,6 +35,7 @@ import {
   MeshTransformConfig,
   DownloadMode,
   CropResult,
+  LoadingProgress,
   DEFAULT_CROP_BOX,
   DEFAULT_MESH_TRANSFORM,
 } from '../core/types';
@@ -69,12 +71,22 @@ export class ModelCropperComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly cropBoxColor = input<string>('#00ff00');
   readonly showGrid = input<boolean>(false);
   readonly showViewHelper = input<boolean>(false);
+  /** Whether to show the loading overlay with spinner (default: true) */
+  readonly showLoadingOverlay = input<boolean>(true);
+  /** Whether to show the error overlay (default: true) */
+  readonly showErrorOverlay = input<boolean>(true);
+  /** Whether to show the loading progress percentage (default: true) */
+  readonly showLoadingProgress = input<boolean>(true);
+  /** Color of the loading spinner (hex string, default: '#4caf50') */
+  readonly spinnerColor = input<string>('#4caf50');
 
   // Outputs using signal-based output()
   readonly cropApplied = output<CropResult>();
   readonly fileReady = output<ArrayBuffer>();
   readonly loadError = output<string>();
   readonly exportError = output<string>();
+  /** Emits loading progress updates during model loading */
+  readonly loadingProgressChange = output<LoadingProgress>();
 
   // Merged labels computed signal
   readonly labels: Signal<Required<ModelCropperLabels>> = computed(() => ({
@@ -87,6 +99,7 @@ export class ModelCropperComponent implements OnInit, AfterViewInit, OnDestroy {
     cropBox: this.service.cropBox(),
     meshTransform: this.service.meshTransform(),
     loadingState: this.service.loadingState(),
+    loadingProgress: this.service.loadingProgress(),
     errorMessage: this.service.errorMessage(),
     boxVisible: this.service.boxVisible(),
     cropBoxColor: this.service.cropBoxColor(),
@@ -112,6 +125,14 @@ export class ModelCropperComponent implements OnInit, AfterViewInit, OnDestroy {
   }));
 
   readonly service = inject(ModelCropperService);
+
+  constructor() {
+    // Effect to emit loading progress changes
+    effect(() => {
+      const progress = this.service.loadingProgress();
+      this.loadingProgressChange.emit(progress);
+    });
+  }
 
   ngOnInit(): void {
     // Set initial values from inputs

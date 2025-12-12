@@ -7,6 +7,7 @@ import { ModelCropperService } from './model-cropper.service';
 import {
   CropBoxConfig,
   MeshTransformConfig,
+  LoadingProgress,
   DEFAULT_CROP_BOX,
   DEFAULT_MESH_TRANSFORM,
 } from '../core/types';
@@ -80,6 +81,15 @@ describe('ModelCropperService', () => {
 
     it('should have null last crop result', () => {
       expect(service.lastCropResult()).toBeNull();
+    });
+
+    it('should have default loading progress', () => {
+      const progress = service.loadingProgress();
+      expect(progress.state).toBe('idle');
+      expect(progress.percentage).toBe(0);
+      expect(progress.loaded).toBe(0);
+      expect(progress.total).toBe(0);
+      expect(progress.message).toBe('');
     });
   });
 

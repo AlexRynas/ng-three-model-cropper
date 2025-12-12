@@ -4,15 +4,27 @@
     <div #viewport class="ntmc-viewport"></div>
 
     <!-- Loading overlay -->
-    @if (service.isLoading()) {
+    @if (showLoadingOverlay() && service.isLoading()) {
       <div class="ntmc-loading-overlay">
-        <div class="ntmc-spinner"></div>
+        <div class="ntmc-spinner" [style.border-top-color]="spinnerColor()"></div>
+        @if (showLoadingProgress()) {
+          <div class="ntmc-progress-container">
+            <span class="ntmc-progress-text">{{ service.loadingProgress().percentage }}%</span>
+            <div class="ntmc-progress-bar">
+              <div
+                class="ntmc-progress-fill"
+                [style.width.%]="service.loadingProgress().percentage"
+                [style.background-color]="spinnerColor()"
+              ></div>
+            </div>
+          </div>
+        }
         <span>{{ labels().loadingLabel }}</span>
       </div>
     }
 
     <!-- Error overlay -->
-    @if (service.hasError()) {
+    @if (showErrorOverlay() && service.hasError()) {
       <div class="ntmc-error-overlay">
         <span class="ntmc-error-icon">⚠️</span>
         <span>{{ labels().errorLabel }}: {{ service.errorMessage() }}</span>

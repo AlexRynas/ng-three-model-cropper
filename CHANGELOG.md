@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2025-12-12
+
+### Added
+
+- **Loading Progress Tracking**: New `LoadingProgress` interface for detailed progress information
+  - `percentage`: Loading progress (0-100)
+  - `loaded`: Bytes loaded
+  - `total`: Total bytes to load
+  - `message`: Human-readable status message
+- **`loadingProgressChange` output**: Emits `LoadingProgress` updates during model loading
+- **`showLoadingOverlay` input**: Control visibility of the loading overlay (default: `true`)
+- **`showErrorOverlay` input**: Control visibility of the error overlay (default: `true`)
+- **`showLoadingProgress` input**: Toggle loading percentage display (default: `true`)
+- **`spinnerColor` input**: Customize spinner color in the default UI (default: `'#4caf50'`)
+- **Progress bar UI**: Visual progress bar during model loading with configurable color
+- Added `loadingProgress` to `ModelCropperUiContext` for custom templates
+- Added `loadingProgress` signal to `ModelCropperService`
+
+### Changed
+
+- Loading overlay now shows percentage and progress bar when `showLoadingProgress` is enabled
+- Spinner color can now be customized via `spinnerColor` input
+- Users can now hide the default loading/error overlays to implement their own UI
+
 ## [1.4.0] - 2025-12-12
 
 ### Changed

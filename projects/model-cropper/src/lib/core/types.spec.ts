@@ -7,6 +7,7 @@ import {
   MeshTransformConfig,
   Vec3,
   LoadingState,
+  LoadingProgress,
   ModelFileType,
   DownloadMode,
   CropResult,
@@ -290,6 +291,50 @@ describe('types', () => {
       expect(vec.x).toBe(1);
       expect(vec.y).toBe(2);
       expect(vec.z).toBe(3);
+    });
+
+    it('should create valid LoadingProgress object', () => {
+      const progress: LoadingProgress = {
+        state: 'loading',
+        percentage: 50,
+        loaded: 500000,
+        total: 1000000,
+        message: 'Loading model...',
+      };
+
+      expect(progress.state).toBe('loading');
+      expect(progress.percentage).toBe(50);
+      expect(progress.loaded).toBe(500000);
+      expect(progress.total).toBe(1000000);
+      expect(progress.message).toBe('Loading model...');
+    });
+
+    it('should allow LoadingProgress with zero total (unknown size)', () => {
+      const progress: LoadingProgress = {
+        state: 'loading',
+        percentage: 0,
+        loaded: 100000,
+        total: 0,
+        message: 'Loading...',
+      };
+
+      expect(progress.total).toBe(0);
+      expect(progress.percentage).toBe(0);
+    });
+
+    it('should allow LoadingProgress with all loading states', () => {
+      const states: LoadingState[] = ['idle', 'loading', 'loaded', 'error'];
+
+      states.forEach((state) => {
+        const progress: LoadingProgress = {
+          state,
+          percentage: state === 'loaded' ? 100 : 0,
+          loaded: 0,
+          total: 0,
+          message: `State: ${state}`,
+        };
+        expect(progress.state).toBe(state);
+      });
     });
   });
 });

@@ -3,7 +3,7 @@
  * This provides the host application with access to the cropper's state and actions
  */
 
-import { CropBoxConfig, MeshTransformConfig, LoadingState, Vec3 } from './types';
+import { CropBoxConfig, MeshTransformConfig, LoadingState, LoadingProgress, Vec3 } from './types';
 
 /**
  * Context object passed to custom UI templates
@@ -14,6 +14,8 @@ export interface ModelCropperUiContext {
   readonly cropBox: CropBoxConfig;
   readonly meshTransform: MeshTransformConfig;
   readonly loadingState: LoadingState;
+  /** Detailed loading progress information */
+  readonly loadingProgress: LoadingProgress;
   readonly errorMessage: string | null;
   readonly boxVisible: boolean;
   readonly cropBoxColor: string;
