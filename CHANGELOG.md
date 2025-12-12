@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.1] - 2025-12-12
+
+### Fixed
+
+- Removed unused `LoadingProgress` import from `model-cropper.service.spec.ts`
+
 ## [1.5.0] - 2025-12-12
 
 ### Added

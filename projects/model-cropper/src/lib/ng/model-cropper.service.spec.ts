@@ -7,7 +7,6 @@ import { ModelCropperService } from './model-cropper.service';
 import {
   CropBoxConfig,
   MeshTransformConfig,
-  LoadingProgress,
   DEFAULT_CROP_BOX,
   DEFAULT_MESH_TRANSFORM,
 } from '../core/types';
