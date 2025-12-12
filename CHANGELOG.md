@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2025-12-12
+
+### Changed
+
+- **Breaking Change**: `canExport` now requires a crop to be applied before export is available
+  - Previously, export was available as soon as a model was loaded
+  - Now, export is only available after `applyCrop()` is called
+  - Changing crop box parameters or mesh transformation invalidates the crop, requiring re-application before export
+- Added `cropIsValid` signal to `ModelCropperService` to track crop validity state
+- Updated documentation to reflect new `canExport` behavior
+
+### Fixed
+
+- Export functionality now properly reflects the state of the cropped model
+
 ## [1.3.2] - 2025-12-12
 
 ### Fixed

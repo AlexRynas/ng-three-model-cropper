@@ -19,7 +19,14 @@ export interface ModelCropperUiContext {
   readonly cropBoxColor: string;
   readonly gridVisible: boolean;
   readonly viewHelperVisible: boolean;
+  /** Whether a crop can be applied (model is loaded) */
   readonly canApplyCrop: boolean;
+  /**
+   * Whether export is available.
+   * Export is only available after a crop has been applied.
+   * Changing crop box parameters or mesh transformation invalidates the crop,
+   * requiring re-application before export is available again.
+   */
   readonly canExport: boolean;
 
   // Actions

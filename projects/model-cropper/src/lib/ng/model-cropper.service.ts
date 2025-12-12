@@ -38,6 +38,7 @@ export class ModelCropperService {
   private readonly _gridVisible: WritableSignal<boolean> = signal(false);
   private readonly _viewHelperVisible: WritableSignal<boolean> = signal(false);
   private readonly _lastCropResult: WritableSignal<CropResult | null> = signal(null);
+  private readonly _cropIsValid: WritableSignal<boolean> = signal(false);
 
   /**
    * Set initial values (must be called before initViewport)
@@ -80,7 +81,10 @@ export class ModelCropperService {
   readonly isLoaded: Signal<boolean> = computed(() => this._loadingState() === 'loaded');
   readonly hasError: Signal<boolean> = computed(() => this._loadingState() === 'error');
   readonly canApplyCrop: Signal<boolean> = computed(() => this._loadingState() === 'loaded');
-  readonly canExport: Signal<boolean> = computed(() => this._loadingState() === 'loaded');
+  readonly canExport: Signal<boolean> = computed(
+    () => this._loadingState() === 'loaded' && this._cropIsValid()
+  );
+  readonly cropIsValid: Signal<boolean> = this._cropIsValid.asReadonly();
 
   /**
    * Initialize the viewport with the host element
@@ -133,11 +137,13 @@ export class ModelCropperService {
 
   /**
    * Update the crop box configuration
+   * Note: This invalidates the current crop, requiring re-application before export
    */
   updateCropBox(box: CropBoxConfig): void {
     const rounded = this.roundCropBox(box);
     this._cropBox.set(rounded);
     this.engine?.updateCropBox(rounded);
+    this._cropIsValid.set(false);
   }
 
   /**
@@ -184,11 +190,13 @@ export class ModelCropperService {
 
   /**
    * Update mesh transformation
+   * Note: This invalidates the current crop, requiring re-application before export
    */
   updateTransform(transform: MeshTransformConfig): void {
     const rounded = this.roundTransform(transform);
     this._meshTransform.set(rounded);
     this.engine?.setMeshTransform(rounded);
+    this._cropIsValid.set(false);
   }
 
   /**
@@ -217,6 +225,7 @@ export class ModelCropperService {
 
   /**
    * Apply cheap cropping to the loaded model
+   * After successful cropping, export becomes available until crop box or transform changes
    */
   applyCrop(): CropResult {
     if (!this.engine) {
@@ -230,6 +239,9 @@ export class ModelCropperService {
 
     const result = this.engine.applyCheapCrop();
     this._lastCropResult.set(result);
+    if (result.success) {
+      this._cropIsValid.set(true);
+    }
     return result;
   }
 
@@ -348,5 +360,6 @@ export class ModelCropperService {
     this._gridVisible.set(false);
     this._viewHelperVisible.set(false);
     this._lastCropResult.set(null);
+    this._cropIsValid.set(false);
   }
 }

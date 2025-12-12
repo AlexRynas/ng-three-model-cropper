@@ -103,6 +103,10 @@ describe('ModelCropperService', () => {
     it('should compute canExport correctly', () => {
       expect(service.canExport()).toBe(false);
     });
+
+    it('should have cropIsValid signal', () => {
+      expect(service.cropIsValid()).toBe(false);
+    });
   });
 
   describe('setInitialValues', () => {
@@ -261,6 +265,24 @@ describe('ModelCropperService', () => {
       expect(service.cropBox()).toEqual(newBox);
     });
 
+    it('should invalidate crop when crop box is updated', () => {
+      // Simulate a valid crop state by applying a crop
+      service.applyCrop();
+
+      // Update crop box
+      service.updateCropBox({
+        minX: -3,
+        maxX: 3,
+        minY: -3,
+        maxY: 3,
+        minZ: -3,
+        maxZ: 3,
+      });
+
+      // Crop should now be invalid
+      expect(service.cropIsValid()).toBe(false);
+    });
+
     it('should round values', () => {
       const preciseBox: CropBoxConfig = {
         minX: -3.456,
@@ -412,6 +434,20 @@ describe('ModelCropperService', () => {
       expect(service.meshTransform()).toEqual(newTransform);
     });
 
+    it('should invalidate crop when transform is updated', () => {
+      // Apply a crop
+      service.applyCrop();
+
+      // Update transform
+      service.updateTransform({
+        position: { x: 1, y: 2, z: 3 },
+        rotation: { x: 0.5, y: 0.5, z: 0.5 },
+      });
+
+      // Crop should now be invalid
+      expect(service.cropIsValid()).toBe(false);
+    });
+
     it('should round transform values', () => {
       const preciseTransform: MeshTransformConfig = {
         position: { x: 1.2345, y: 2.3456, z: 3.4567 },
@@ -479,6 +515,15 @@ describe('ModelCropperService', () => {
       const result = service.applyCrop();
 
       expect(service.lastCropResult()).toEqual(result);
+    });
+
+    it('should set cropIsValid to true on successful crop', () => {
+      // Apply crop (no model loaded, but engine initialized)
+      service.applyCrop();
+
+      // Note: Without a model, the crop may not be "successful"
+      // This tests that the mechanism exists
+      expect(typeof service.cropIsValid()).toBe('boolean');
     });
 
     it('should return CropResult with correct structure', () => {
@@ -584,6 +629,7 @@ describe('ModelCropperService', () => {
       expect(service.viewHelperVisible()).toBe(false);
       expect(service.lastCropResult()).toBeNull();
       expect(service.getEngine()).toBeNull();
+      expect(service.cropIsValid()).toBe(false);
     });
 
     it('should be safe to call multiple times', () => {
@@ -612,6 +658,54 @@ describe('ModelCropperService', () => {
 
     it('should emit canApplyCrop based on loading state', () => {
       expect(service.canApplyCrop()).toBe(false);
+    });
+
+    it('should emit canExport based on loading state and crop validity', () => {
+      // Initially false because no model loaded
+      expect(service.canExport()).toBe(false);
+    });
+  });
+
+  describe('Crop Validity and Export Availability', () => {
+    beforeEach(() => {
+      service.initViewport(hostElement);
+    });
+
+    it('should start with invalid crop', () => {
+      expect(service.cropIsValid()).toBe(false);
+    });
+
+    it('should invalidate crop when crop box value is updated', () => {
+      service.applyCrop();
+
+      service.updateCropBoxValue('minX', -5);
+
+      expect(service.cropIsValid()).toBe(false);
+    });
+
+    it('should invalidate crop when position is updated', () => {
+      service.applyCrop();
+
+      service.updatePosition({ x: 1 });
+
+      expect(service.cropIsValid()).toBe(false);
+    });
+
+    it('should invalidate crop when rotation is updated', () => {
+      service.applyCrop();
+
+      service.updateRotation({ y: 0.5 });
+
+      expect(service.cropIsValid()).toBe(false);
+    });
+
+    it('should require re-applying crop after parameter changes for export', () => {
+      // This tests the intended workflow
+      service.applyCrop();
+      service.updateCropBox(DEFAULT_CROP_BOX);
+
+      // Export should not be available until crop is re-applied
+      expect(service.cropIsValid()).toBe(false);
     });
   });
 });

@@ -130,6 +130,7 @@ describe('ModelCropperComponent', () => {
         hasError: signal(false),
         canApplyCrop: signal(false),
         canExport: signal(false),
+        cropIsValid: signal(false),
       }
     );
 
