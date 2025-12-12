@@ -3,15 +3,15 @@
  */
 
 import * as THREE from 'three';
-import { CheapCropper, CheapCropOptions, TriangleTestStrategy } from './cheap-cropper';
-import { CropBoxConfig, CropResult } from './types';
+import { CheapCropper } from './cheap-cropper';
+import { CropBoxConfig } from './types';
 
 describe('CheapCropper', () => {
   /**
    * Helper function to create a simple box geometry mesh
    */
   function createTestMesh(
-    size: number = 2,
+    size = 2,
     position: THREE.Vector3 = new THREE.Vector3(0, 0, 0)
   ): THREE.Mesh {
     const geometry = new THREE.BoxGeometry(size, size, size);

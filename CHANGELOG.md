@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1] - 2025-12-12
+
+### Fixed
+
+- Resolved ESLint errors causing CI build failures:
+  - Removed unused imports across test files
+  - Removed trivially inferred type annotations
+  - Fixed unused variables in catch blocks and test setup
+  - Fixed Prettier formatting issues
+
 ## [1.3.0] - 2024-12-12
 
 ### Added

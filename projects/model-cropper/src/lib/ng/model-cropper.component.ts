@@ -22,7 +22,6 @@ import {
   input,
   output,
   computed,
-  effect,
   Signal,
   inject,
 } from '@angular/core';

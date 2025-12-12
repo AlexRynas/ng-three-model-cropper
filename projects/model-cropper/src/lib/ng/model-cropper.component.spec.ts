@@ -458,7 +458,7 @@ describe('ModelCropperComponent', () => {
         fixture.detectChanges();
 
         // Create a spy for triggerDownload (private method)
-        const originalTriggerDownload = (
+        const _originalTriggerDownload = (
           component as unknown as { triggerDownload: (buffer: ArrayBuffer) => void }
         ).triggerDownload;
         const triggerDownloadSpy = spyOn(
@@ -538,7 +538,7 @@ describe('ModelCropperComponent', () => {
 
 describe('ModelCropperComponent with Test Host', () => {
   let hostFixture: ComponentFixture<TestHostComponent>;
-  let hostComponent: TestHostComponent;
+  let _hostComponent: TestHostComponent;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -546,7 +546,7 @@ describe('ModelCropperComponent with Test Host', () => {
     }).compileComponents();
 
     hostFixture = TestBed.createComponent(TestHostComponent);
-    hostComponent = hostFixture.componentInstance;
+    _hostComponent = hostFixture.componentInstance;
   });
 
   afterEach(() => {

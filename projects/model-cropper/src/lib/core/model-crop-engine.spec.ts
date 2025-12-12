@@ -4,14 +4,7 @@
 
 import * as THREE from 'three';
 import { ModelCropEngine, StateChangeCallback } from './model-crop-engine';
-import {
-  CropBoxConfig,
-  MeshTransformConfig,
-  LoadingState,
-  CropResult,
-  DEFAULT_CROP_BOX,
-  DEFAULT_MESH_TRANSFORM,
-} from './types';
+import { CropBoxConfig, MeshTransformConfig, LoadingState } from './types';
 
 describe('ModelCropEngine', () => {
   let engine: ModelCropEngine;
@@ -305,7 +298,7 @@ describe('ModelCropEngine', () => {
 
       try {
         await engine.loadModel('nonexistent-file.glb');
-      } catch (error) {
+      } catch {
         // Expected to fail
       }
 
@@ -477,7 +470,7 @@ describe('ModelCropEngine with Mock Model', () => {
 
   describe('applyCheapCrop with model', () => {
     it('should crop model when loaded', () => {
-      const model = injectMockModel(engine);
+      const _model = injectMockModel(engine);
 
       engine.updateCropBox({
         minX: -0.5,
