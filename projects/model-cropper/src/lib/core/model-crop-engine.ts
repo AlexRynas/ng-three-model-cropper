@@ -351,14 +351,14 @@ export class ModelCropEngine {
 
     // File instance carries a name and mime type
     if (src instanceof File) {
-      const fileType = this.inferFileType(src.name, src.type);
+      const fileType = await this.inferFileType(src.name, src.type, src);
       const objectUrl = URL.createObjectURL(src);
       return { url: objectUrl, fileType, revokeUrl: () => URL.revokeObjectURL(objectUrl) };
     }
 
     // Blob instance or blob URL string
     const blob: Blob = src instanceof Blob ? src : await this.fetchBlobFromUrl(src);
-    const inferredType = this.inferFileType(undefined, blob.type);
+    const inferredType = await this.inferFileType(undefined, blob.type, blob);
     const objectUrl = URL.createObjectURL(blob);
     return {
       url: objectUrl,
@@ -368,21 +368,73 @@ export class ModelCropEngine {
   }
 
   /**
-   * Infer model file type from optional filename and MIME type
+   * Infer model file type from optional filename, MIME type, or file content (magic bytes)
    */
-  private inferFileType(filename?: string, mimeType?: string): ReturnType<typeof getModelFileType> {
+  private async inferFileType(
+    filename?: string,
+    mimeType?: string,
+    blob?: Blob
+  ): Promise<ReturnType<typeof getModelFileType>> {
+    // First, try by filename extension
     if (filename) {
       const byName = getModelFileType(filename);
       if (byName !== 'unknown') return byName;
     }
 
+    // Then try by MIME type (but ignore unreliable types)
     if (mimeType) {
       const lower = mimeType.toLowerCase();
-      if (lower.includes('fbx')) return 'fbx';
-      if (lower.includes('gltf') || lower.includes('glb')) return 'glb';
+      // Skip unreliable MIME types that don't actually indicate file format
+      const unreliableMimeTypes = ['text/plain', 'application/octet-stream', 'binary/octet-stream'];
+      if (!unreliableMimeTypes.includes(lower)) {
+        if (lower.includes('fbx')) return 'fbx';
+        if (lower.includes('gltf') || lower.includes('glb')) return 'glb';
+      }
+    }
+
+    // Finally, try detecting from file content (magic bytes)
+    if (blob) {
+      const detectedType = await this.detectFileTypeFromContent(blob);
+      if (detectedType !== 'unknown') return detectedType;
     }
 
     return 'unknown';
+  }
+
+  /**
+   * Detect file type by reading magic bytes from the blob content
+   */
+  private async detectFileTypeFromContent(
+    blob: Blob
+  ): Promise<ReturnType<typeof getModelFileType>> {
+    try {
+      // Read the first 64 bytes to check magic signatures
+      const headerSlice = blob.slice(0, 64);
+      const buffer = await headerSlice.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+
+      // GLB: starts with "glTF" magic (0x67 0x6C 0x54 0x46)
+      if (bytes[0] === 0x67 && bytes[1] === 0x6c && bytes[2] === 0x54 && bytes[3] === 0x46) {
+        return 'glb';
+      }
+
+      // FBX Binary: starts with "Kaydara FBX Binary" followed by null bytes
+      const fbxMagic = 'Kaydara FBX Binary';
+      const headerString = new TextDecoder('ascii').decode(bytes.slice(0, fbxMagic.length));
+      if (headerString === fbxMagic) {
+        return 'fbx';
+      }
+
+      // GLTF (JSON): starts with '{' (possibly with leading whitespace)
+      const textStart = new TextDecoder('utf-8').decode(bytes.slice(0, 32)).trim();
+      if (textStart.startsWith('{')) {
+        return 'gltf';
+      }
+
+      return 'unknown';
+    } catch {
+      return 'unknown';
+    }
   }
 
   /**

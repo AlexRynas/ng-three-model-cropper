@@ -9,6 +9,9 @@ All notable changes to this project will be documented in this file.
 - **ViewHelper compatibility with Three.js r166+**: Axis labels (X, Y, Z) are now properly displayed when using Three.js version 166 or higher
   - Three.js r166 introduced a breaking change requiring explicit `setLabels()` call
   - Added runtime check for backward compatibility with older Three.js versions
+- **FBX file loading with incorrect MIME types**: Fixed model loading failing when servers return unreliable MIME types like `text/plain` or `application/octet-stream`
+  - Added magic byte detection to identify file formats (GLB, FBX, GLTF) from content
+  - `inferFileType` now checks file headers when MIME type is unreliable
 
 ## [1.5.1] - 2025-12-12
 
