@@ -506,28 +506,29 @@ export class ModelCropEngine {
     let cameraDistance = maxDim / (2 * Math.tan(fov / 2));
     cameraDistance *= 1.5; // Add some padding
 
-    // Center model
-    model.position.sub(center);
-
-    // Position camera
-    this.camera.position.set(cameraDistance, cameraDistance, cameraDistance);
-    this.camera.lookAt(0, 0, 0);
-    this.controls.target.set(0, 0, 0);
+    // Position camera to look at the model's center (without moving the model)
+    this.camera.position.set(
+      center.x + cameraDistance,
+      center.y + cameraDistance,
+      center.z + cameraDistance
+    );
+    this.camera.lookAt(center);
+    this.controls.target.copy(center);
     this.controls.update();
 
     if (this.viewHelper) {
       this.viewHelper.center.copy(this.controls.target);
     }
 
-    // Update default crop box based on model size
+    // Update default crop box based on actual model bounds (model stays at its original position)
     const padding = 0.1;
     this.currentCropBox = {
-      minX: -size.x / 2 - padding,
-      minY: -size.y / 2 - padding,
-      minZ: -size.z / 2 - padding,
-      maxX: size.x / 2 + padding,
-      maxY: size.y / 2 + padding,
-      maxZ: size.z / 2 + padding,
+      minX: box.min.x - padding,
+      minY: box.min.y - padding,
+      minZ: box.min.z - padding,
+      maxX: box.max.x + padding,
+      maxY: box.max.y + padding,
+      maxZ: box.max.z + padding,
     };
   }
 

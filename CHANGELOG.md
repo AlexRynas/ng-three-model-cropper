@@ -12,6 +12,10 @@ All notable changes to this project will be documented in this file.
 - **FBX file loading with incorrect MIME types**: Fixed model loading failing when servers return unreliable MIME types like `text/plain` or `application/octet-stream`
   - Added magic byte detection to identify file formats (GLB, FBX, GLTF) from content
   - `inferFileType` now checks file headers when MIME type is unreliable
+- **Crop box calculation for offset models**: Fixed crop box not aligning with model geometry when the model is positioned above the world origin (e.g., standing on the ground plane)
+  - Crop box now correctly wraps around the model's actual bounding box instead of assuming the model is centered at origin
+  - Model position is no longer automatically modified; only the crop box position and dimensions are calculated
+  - Camera now orbits around the model's actual center for better viewing experience
 
 ## [1.5.1] - 2025-12-12
 

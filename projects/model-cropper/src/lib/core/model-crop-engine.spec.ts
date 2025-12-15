@@ -581,3 +581,169 @@ describe('StateChangeCallback type', () => {
     callback('Test error message');
   });
 });
+
+describe('ModelCropEngine fitModelInView behavior', () => {
+  let engine: ModelCropEngine;
+  let hostElement: HTMLDivElement;
+
+  beforeEach(() => {
+    hostElement = document.createElement('div');
+    Object.defineProperty(hostElement, 'clientWidth', { value: 800, configurable: true });
+    Object.defineProperty(hostElement, 'clientHeight', { value: 600, configurable: true });
+    document.body.appendChild(hostElement);
+    engine = new ModelCropEngine(hostElement);
+  });
+
+  afterEach(() => {
+    engine?.dispose();
+    if (hostElement.parentNode) {
+      document.body.removeChild(hostElement);
+    }
+  });
+
+  // Helper to create a model at a specific position and call fitModelInView
+  function createModelAndFit(
+    engine: ModelCropEngine,
+    meshPosition: { x: number; y: number; z: number }
+  ): THREE.Group {
+    const group = new THREE.Group();
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    const mesh = new THREE.Mesh(geometry, material);
+    // Position the mesh within the group
+    mesh.position.set(meshPosition.x, meshPosition.y, meshPosition.z);
+    group.add(mesh);
+    group.updateMatrixWorld(true);
+
+    // Access private scene and add model
+    const scene = (engine as unknown as { scene: THREE.Scene }).scene;
+    scene.add(group);
+
+    // Set loadedModel
+    (engine as unknown as { loadedModel: THREE.Object3D | null }).loadedModel = group;
+
+    // Call fitModelInView
+    (engine as unknown as { fitModelInView: (model: THREE.Object3D) => void }).fitModelInView(
+      group
+    );
+
+    return group;
+  }
+
+  describe('Model position preservation', () => {
+    it('should not modify model position for centered model', () => {
+      const model = createModelAndFit(engine, { x: 0, y: 0, z: 0 });
+
+      // Model position should remain at origin
+      expect(model.position.x).toBe(0);
+      expect(model.position.y).toBe(0);
+      expect(model.position.z).toBe(0);
+    });
+
+    it('should not modify model position for offset model (above origin)', () => {
+      const model = createModelAndFit(engine, { x: 0, y: 1, z: 0 });
+
+      // Model group position should remain at origin (mesh is offset within group)
+      expect(model.position.x).toBe(0);
+      expect(model.position.y).toBe(0);
+      expect(model.position.z).toBe(0);
+    });
+
+    it('should not modify model position for arbitrarily positioned model', () => {
+      const model = createModelAndFit(engine, { x: 5, y: 10, z: -3 });
+
+      // Model group position should remain at origin
+      expect(model.position.x).toBe(0);
+      expect(model.position.y).toBe(0);
+      expect(model.position.z).toBe(0);
+    });
+  });
+
+  describe('Crop box calculation for different model positions', () => {
+    it('should calculate crop box around centered model', () => {
+      createModelAndFit(engine, { x: 0, y: 0, z: 0 });
+
+      const cropBox = engine.getCropBox();
+      const padding = 0.1;
+
+      // Model is a 1x1x1 box centered at origin, so bounds are -0.5 to 0.5
+      expect(cropBox.minX).toBeCloseTo(-0.5 - padding, 5);
+      expect(cropBox.maxX).toBeCloseTo(0.5 + padding, 5);
+      expect(cropBox.minY).toBeCloseTo(-0.5 - padding, 5);
+      expect(cropBox.maxY).toBeCloseTo(0.5 + padding, 5);
+      expect(cropBox.minZ).toBeCloseTo(-0.5 - padding, 5);
+      expect(cropBox.maxZ).toBeCloseTo(0.5 + padding, 5);
+    });
+
+    it('should calculate crop box around model above origin (standing on ground)', () => {
+      // Mesh positioned so its bottom is at y=0 (center at y=0.5 for 1x1x1 box)
+      createModelAndFit(engine, { x: 0, y: 0.5, z: 0 });
+
+      const cropBox = engine.getCropBox();
+      const padding = 0.1;
+
+      // Model bounds: y from 0 to 1
+      expect(cropBox.minY).toBeCloseTo(0 - padding, 5);
+      expect(cropBox.maxY).toBeCloseTo(1 + padding, 5);
+
+      // X and Z remain centered
+      expect(cropBox.minX).toBeCloseTo(-0.5 - padding, 5);
+      expect(cropBox.maxX).toBeCloseTo(0.5 + padding, 5);
+    });
+
+    it('should calculate crop box around arbitrarily positioned model', () => {
+      // Model centered at (2, 3, 4)
+      createModelAndFit(engine, { x: 2, y: 3, z: 4 });
+
+      const cropBox = engine.getCropBox();
+      const padding = 0.1;
+
+      // Model is 1x1x1, so bounds extend 0.5 in each direction from center
+      expect(cropBox.minX).toBeCloseTo(2 - 0.5 - padding, 5);
+      expect(cropBox.maxX).toBeCloseTo(2 + 0.5 + padding, 5);
+      expect(cropBox.minY).toBeCloseTo(3 - 0.5 - padding, 5);
+      expect(cropBox.maxY).toBeCloseTo(3 + 0.5 + padding, 5);
+      expect(cropBox.minZ).toBeCloseTo(4 - 0.5 - padding, 5);
+      expect(cropBox.maxZ).toBeCloseTo(4 + 0.5 + padding, 5);
+    });
+
+    it('should calculate asymmetric crop box for model in negative coordinates', () => {
+      // Model centered at (-1, -2, -3)
+      createModelAndFit(engine, { x: -1, y: -2, z: -3 });
+
+      const cropBox = engine.getCropBox();
+      const padding = 0.1;
+
+      expect(cropBox.minX).toBeCloseTo(-1 - 0.5 - padding, 5);
+      expect(cropBox.maxX).toBeCloseTo(-1 + 0.5 + padding, 5);
+      expect(cropBox.minY).toBeCloseTo(-2 - 0.5 - padding, 5);
+      expect(cropBox.maxY).toBeCloseTo(-2 + 0.5 + padding, 5);
+      expect(cropBox.minZ).toBeCloseTo(-3 - 0.5 - padding, 5);
+      expect(cropBox.maxZ).toBeCloseTo(-3 + 0.5 + padding, 5);
+    });
+  });
+
+  describe('Camera targeting', () => {
+    it('should set controls target to model center for offset model', () => {
+      createModelAndFit(engine, { x: 0, y: 5, z: 0 });
+
+      // Access private controls
+      const controls = (engine as unknown as { controls: { target: THREE.Vector3 } }).controls;
+
+      // Controls target should be at model center (0, 5, 0)
+      expect(controls.target.x).toBeCloseTo(0, 5);
+      expect(controls.target.y).toBeCloseTo(5, 5);
+      expect(controls.target.z).toBeCloseTo(0, 5);
+    });
+
+    it('should set controls target to model center for arbitrarily positioned model', () => {
+      createModelAndFit(engine, { x: 3, y: 4, z: 5 });
+
+      const controls = (engine as unknown as { controls: { target: THREE.Vector3 } }).controls;
+
+      expect(controls.target.x).toBeCloseTo(3, 5);
+      expect(controls.target.y).toBeCloseTo(4, 5);
+      expect(controls.target.z).toBeCloseTo(5, 5);
+    });
+  });
+});
