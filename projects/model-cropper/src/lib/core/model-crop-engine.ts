@@ -182,6 +182,17 @@ export class ModelCropEngine {
       this.viewHelper = new ViewHelper(this.camera, this.renderer.domElement);
       // Initialize center to current controls target
       this.viewHelper.center.copy(this.controls.target);
+      // Three.js r166+ requires explicit setLabels call to display axis labels
+      // Check if method exists for backward compatibility with older versions
+      if (
+        typeof (
+          this.viewHelper as ViewHelper & { setLabels?: (x: string, y: string, z: string) => void }
+        ).setLabels === 'function'
+      ) {
+        (
+          this.viewHelper as ViewHelper & { setLabels: (x: string, y: string, z: string) => void }
+        ).setLabels('X', 'Y', 'Z');
+      }
     }
 
     if (this.viewHelper) {

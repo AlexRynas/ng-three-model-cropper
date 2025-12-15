@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.2] - 2025-12-15
+
+### Fixed
+
+- **ViewHelper compatibility with Three.js r166+**: Axis labels (X, Y, Z) are now properly displayed when using Three.js version 166 or higher
+  - Three.js r166 introduced a breaking change requiring explicit `setLabels()` call
+  - Added runtime check for backward compatibility with older Three.js versions
+
 ## [1.5.1] - 2025-12-12
 
 ### Fixed
