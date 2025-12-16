@@ -2,9 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.3] - 2025-12-16
+
+### Fixed (1.5.3)
+
+- **Intermittent Vite import resolution error during demo development**: Reduced occurrences of `[vite] Pre-transform error: Failed to resolve import "ng-three-model-cropper"` by switching the demo app's development build to resolve the library from source instead of the `dist/` output.
+
+### Added (1.5.3)
+
+- `npm run dev:dist` for optional validation against the built `dist/model-cropper` package output.
+- Dev helper script `scripts/wait-for-lib-dist.mjs` to wait for library build artifacts before starting a dist-based dev session.
+
+### Changed (1.5.3)
+
+- `npm run dev` now starts the demo app using the development tsconfig that maps `ng-three-model-cropper` to `projects/model-cropper/src/public-api.ts`.
+
 ## [1.5.2] - 2025-12-15
 
-### Fixed
+### Fixed (1.5.2)
 
 - **ViewHelper compatibility with Three.js r166+**: Axis labels (X, Y, Z) are now properly displayed when using Three.js version 166 or higher
   - Three.js r166 introduced a breaking change requiring explicit `setLabels()` call
@@ -19,13 +34,13 @@ All notable changes to this project will be documented in this file.
 
 ## [1.5.1] - 2025-12-12
 
-### Fixed
+### Fixed (1.5.1)
 
 - Removed unused `LoadingProgress` import from `model-cropper.service.spec.ts`
 
 ## [1.5.0] - 2025-12-12
 
-### Added
+### Added (1.5.0)
 
 - **Loading Progress Tracking**: New `LoadingProgress` interface for detailed progress information
   - `percentage`: Loading progress (0-100)
@@ -41,7 +56,7 @@ All notable changes to this project will be documented in this file.
 - Added `loadingProgress` to `ModelCropperUiContext` for custom templates
 - Added `loadingProgress` signal to `ModelCropperService`
 
-### Changed
+### Changed (1.5.0)
 
 - Loading overlay now shows percentage and progress bar when `showLoadingProgress` is enabled
 - Spinner color can now be customized via `spinnerColor` input
@@ -49,7 +64,7 @@ All notable changes to this project will be documented in this file.
 
 ## [1.4.0] - 2025-12-12
 
-### Changed
+### Changed (1.4.0)
 
 - **Breaking Change**: `canExport` now requires a crop to be applied before export is available
   - Previously, export was available as soon as a model was loaded
@@ -58,25 +73,25 @@ All notable changes to this project will be documented in this file.
 - Added `cropIsValid` signal to `ModelCropperService` to track crop validity state
 - Updated documentation to reflect new `canExport` behavior
 
-### Fixed
+### Fixed (1.4.0)
 
 - Export functionality now properly reflects the state of the cropped model
 
 ## [1.3.2] - 2025-12-12
 
-### Fixed
+### Fixed (1.3.2)
 
 - Refactored `ModelCropperComponent` lifecycle to use `ngOnInit()` instead of constructor for initialization
 - Reorganized test structure to properly separate "Component Creation" and "Lifecycle Hooks" test suites in `model-cropper.component.spec.ts`
 
-### Changed
+### Changed (1.3.2)
 
 - Demo app now showcases `showGrid`, `showViewHelper`, and `cropBoxColor` inputs
 - Added `exportError` event handler to demo app for better error handling examples
 
 ## [1.3.1] - 2025-12-12
 
-### Fixed
+### Fixed (1.3.1)
 
 - Resolved ESLint errors causing CI build failures:
   - Removed unused imports across test files
@@ -86,7 +101,7 @@ All notable changes to this project will be documented in this file.
 
 ## [1.3.0] - 2024-12-12
 
-### Added
+### Added (1.3.0)
 
 - Comprehensive unit test suite with 241 tests covering:
   - Core types and utility functions (`types.spec.ts`)
@@ -99,7 +114,7 @@ All notable changes to this project will be documented in this file.
 
 ## [1.2.0] - 2024-12-11
 
-### Added
+### Added (1.2.0)
 
 - Crop box color customization via `cropBoxColor` input
 - Grid helper visibility toggle via `showGrid` input
@@ -107,14 +122,14 @@ All notable changes to this project will be documented in this file.
 
 ## [1.1.0] - 2024-12-11
 
-### Added
+### Added (1.1.0)
 
 - Support for various model source types
 - Enhanced model loading capabilities
 
 ## [1.0.0] - 2024-12-11
 
-### Added
+### Added (1.0.0)
 
 - Initial release
 - GLB/GLTF/FBX model loading

@@ -46,7 +46,14 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "tsConfig": "tsconfig.app.dev.json"
+            },
+            "development-dist": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "tsConfig": "tsconfig.app.json"
             }
           },
           "defaultConfiguration": "production"
@@ -59,6 +66,9 @@
             },
             "development": {
               "buildTarget": "ng-three-model-cropper:build:development"
+            },
+            "development-dist": {
+              "buildTarget": "ng-three-model-cropper:build:development-dist"
             }
           },
           "defaultConfiguration": "development"

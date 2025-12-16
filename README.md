@@ -292,6 +292,25 @@ npm run test:lib:watch
 npm test
 ```
 
+## Development (Demo App)
+
+```bash
+# Run the demo app (recommended)
+npm run dev
+```
+
+In development mode, the demo app resolves `ng-three-model-cropper` directly from the library source (`projects/model-cropper/src`). This avoids intermittent Vite pre-transform resolution failures that can happen when using the built `dist/` output while it is being regenerated.
+
+### Optional: Test the built `dist/` output
+
+If you specifically want to validate the packaged output in `dist/model-cropper`:
+
+```bash
+npm run dev:dist
+```
+
+This runs a one-time library build first. If you want live rebuilds of the library output, run `npm run watch:lib` in a separate terminal.
+
 ### Future Angular Versions
 
 The `core/` folder is framework-agnostic. To support Angular 19/20+:
@@ -305,11 +324,10 @@ The `core/` folder is framework-agnostic. To support Angular 19/20+:
 
 ```bash
 # Build library
-ng build model-cropper --configuration production
+npm run build:lib
 
 # Publish to npm
-cd dist/model-cropper
-npm publish
+npm run publish:lib
 ```
 
 ## Requirements

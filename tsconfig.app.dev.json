@@ -1,0 +1,11 @@
+/* Development tsconfig for the demo app.
+   Uses the library sources directly to avoid dist/packaging race conditions in Vite. */
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "paths": {
+      "model-cropper": ["./projects/model-cropper/src/public-api.ts"],
+      "ng-three-model-cropper": ["./projects/model-cropper/src/public-api.ts"]
+    }
+  }
+}

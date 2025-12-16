@@ -60,12 +60,27 @@ See the main README for complete API documentation.
 ## Build
 
 ```bash
+# From the repo root
+npm run build:lib
+
+# Or directly
 ng build model-cropper --configuration production
+```
+
+## Watch (Library Development)
+
+```bash
+# Rebuild the library on changes
+npm run watch:lib
 ```
 
 ## Publishing
 
 ```bash
+# From the repo root
+npm run publish:lib
+
+# Or manually
 cd dist/model-cropper
 npm publish
 ```
