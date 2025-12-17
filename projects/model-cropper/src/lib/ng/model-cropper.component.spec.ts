@@ -326,6 +326,23 @@ describe('ModelCropperComponent', () => {
       fixture.detectChanges();
       expect(component.spinnerColor()).toBe('#4caf50');
     });
+
+    it('should have rotationUnit default to radians', () => {
+      fixture.detectChanges();
+      expect(component.rotationUnit()).toBe('radians');
+    });
+
+    it('should accept rotationUnit input and pass to service', () => {
+      fixture.componentRef.setInput('rotationUnit', 'degrees');
+      fixture.detectChanges();
+
+      expect(component.rotationUnit()).toBe('degrees');
+
+      // Ensure setInitialValues was called with rotation unit as fourth argument
+      const lastCall = (mockService.setInitialValues as jasmine.Spy).calls.mostRecent();
+      expect(lastCall).toBeDefined();
+      expect(lastCall.args[3]).toBe('degrees');
+    });
   });
 
   describe('Labels', () => {

@@ -38,6 +38,7 @@ import {
   LoadingProgress,
   DEFAULT_CROP_BOX,
   DEFAULT_MESH_TRANSFORM,
+  AngleUnit,
 } from '../core/types';
 import { ModelCropperUiContext, ModelCropperLabels, DEFAULT_LABELS } from '../core/ui-context';
 import { ModelCropperService } from './model-cropper.service';
@@ -79,6 +80,12 @@ export class ModelCropperComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly showLoadingProgress = input<boolean>(true);
   /** Color of the loading spinner (hex string, default: '#4caf50') */
   readonly spinnerColor = input<string>('#4caf50');
+  /**
+   * Unit for rotation values passed to setRotation in the UI context.
+   * - 'radians': Rotation values are in radians (default, Three.js native)
+   * - 'degrees': Rotation values are in degrees (-180 to 180, etc.)
+   */
+  readonly rotationUnit = input<AngleUnit>('radians');
 
   // Outputs using signal-based output()
   readonly cropApplied = output<CropResult>();
@@ -138,11 +145,17 @@ export class ModelCropperComponent implements OnInit, AfterViewInit, OnDestroy {
     // Set initial values from inputs
     const initialBox = this.initialCropBox();
     const initialTrans = this.initialTransform();
-    this.service.setInitialValues(initialBox, initialTrans, {
-      cropBoxColor: this.cropBoxColor(),
-      showGrid: this.showGrid(),
-      showViewHelper: this.showViewHelper(),
-    });
+    const rotationUnit = this.rotationUnit();
+    this.service.setInitialValues(
+      initialBox,
+      initialTrans,
+      {
+        cropBoxColor: this.cropBoxColor(),
+        showGrid: this.showGrid(),
+        showViewHelper: this.showViewHelper(),
+      },
+      rotationUnit
+    );
   }
 
   ngAfterViewInit(): void {

@@ -16,6 +16,7 @@ import {
   CropResult,
   DEFAULT_CROP_BOX,
   DEFAULT_MESH_TRANSFORM,
+  AngleUnit,
 } from '../core/types';
 import { ModelCropEngine } from '../core/model-crop-engine';
 
@@ -53,6 +54,7 @@ export class ModelCropperService {
   private readonly _viewHelperVisible: WritableSignal<boolean> = signal(false);
   private readonly _lastCropResult: WritableSignal<CropResult | null> = signal(null);
   private readonly _cropIsValid: WritableSignal<boolean> = signal(false);
+  private readonly _rotationUnit: WritableSignal<AngleUnit> = signal('radians');
 
   /**
    * Set initial values (must be called before initViewport)
@@ -60,7 +62,8 @@ export class ModelCropperService {
   setInitialValues(
     cropBox?: CropBoxConfig,
     transform?: MeshTransformConfig,
-    visualOptions?: { cropBoxColor?: string; showGrid?: boolean; showViewHelper?: boolean }
+    visualOptions?: { cropBoxColor?: string; showGrid?: boolean; showViewHelper?: boolean },
+    rotationUnit?: AngleUnit
   ): void {
     if (cropBox) {
       this._cropBox.set(this.roundCropBox(cropBox));
@@ -76,6 +79,9 @@ export class ModelCropperService {
     }
     if (typeof visualOptions?.showViewHelper === 'boolean') {
       this._viewHelperVisible.set(visualOptions.showViewHelper);
+    }
+    if (rotationUnit) {
+      this._rotationUnit.set(rotationUnit);
     }
   }
 
@@ -249,14 +255,39 @@ export class ModelCropperService {
 
   /**
    * Update rotation values
+   * @param rotation - Partial rotation values for x, y, z axes
    */
   updateRotation(rotation: Partial<{ x: number; y: number; z: number }>): void {
+    const effectiveUnit = this._rotationUnit();
     const current = this._meshTransform();
+
+    // Convert to radians if degrees are provided
+    const convertedRotation: Partial<{ x: number; y: number; z: number }> = {};
+    if (rotation.x !== undefined) {
+      convertedRotation.x =
+        effectiveUnit === 'degrees' ? this.degreesToRadians(rotation.x) : rotation.x;
+    }
+    if (rotation.y !== undefined) {
+      convertedRotation.y =
+        effectiveUnit === 'degrees' ? this.degreesToRadians(rotation.y) : rotation.y;
+    }
+    if (rotation.z !== undefined) {
+      convertedRotation.z =
+        effectiveUnit === 'degrees' ? this.degreesToRadians(rotation.z) : rotation.z;
+    }
+
     const updated: MeshTransformConfig = {
       ...current,
-      rotation: { ...current.rotation, ...rotation },
+      rotation: { ...current.rotation, ...convertedRotation },
     };
     this.updateTransform(updated);
+  }
+
+  /**
+   * Converts degrees to radians
+   */
+  private degreesToRadians(degrees: number): number {
+    return degrees * (Math.PI / 180);
   }
 
   /**

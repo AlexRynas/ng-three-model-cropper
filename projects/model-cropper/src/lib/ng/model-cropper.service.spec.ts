@@ -186,8 +186,18 @@ describe('ModelCropperService', () => {
       expect(transform.position.x).toBe(1.23);
       expect(transform.rotation.z).toBe(0.35);
     });
-  });
 
+    it('should accept rotationUnit and convert degrees to radians on update', () => {
+      // Set rotation unit to degrees
+      service.setInitialValues(undefined, undefined, undefined, 'degrees');
+
+      // Update rotation using degrees - 180 degrees should become ~3.14 radians
+      service.updateRotation({ y: 180 });
+
+      const rounded = Math.round(service.meshTransform().rotation.y * 100) / 100;
+      expect(rounded).toBe(3.14);
+    });
+  });
   describe('initViewport', () => {
     it('should initialize viewport', () => {
       service.initViewport(hostElement);

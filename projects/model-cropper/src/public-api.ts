@@ -17,6 +17,7 @@ export {
   CropResult,
   Vec3,
   ModelCropEngineConfig,
+  AngleUnit,
   DEFAULT_CROP_BOX,
   DEFAULT_MESH_TRANSFORM,
   updateCropBox,

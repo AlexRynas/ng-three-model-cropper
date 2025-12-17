@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2025-12-17
+
+### Added (1.6.0)
+
+- **Rotation Angle Unit Support**: Added support for specifying the unit of rotation values (radians or degrees) passed to the UI context's `setRotation` function.
+  - New `AngleUnit` type: `'radians' | 'degrees'`.
+  - New `rotationUnit` input on the component to control the unit for rotation values.
+  - The `setRotation` function continues to accept only a single argument (the rotation value). To specify the unit (radians or degrees), use the `rotationUnit` input.
+
+### Changed (1.6.0)
+
+- **Breaking**: If you pass degrees to `setRotation`, you must now set the `rotationUnit` input to `'degrees'`. The default remains radians for backward compatibility.
+
 ## [1.5.3] - 2025-12-16
 
 ### Fixed (1.5.3)

@@ -336,5 +336,10 @@ describe('types', () => {
         expect(progress.state).toBe(state);
       });
     });
+
+    it('should allow AngleUnit values', () => {
+      const units: ('radians' | 'degrees')[] = ['radians', 'degrees'];
+      expect(units.length).toBe(2);
+    });
   });
 });

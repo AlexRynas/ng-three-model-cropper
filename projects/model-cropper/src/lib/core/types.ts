@@ -41,6 +41,13 @@ export interface MeshTransformConfig {
 export type DownloadMode = 'download' | 'emit';
 
 /**
+ * Angle unit for rotation values
+ * - 'radians': Rotation values are in radians (default, Three.js native)
+ * - 'degrees': Rotation values are in degrees (-180 to 180, etc.)
+ */
+export type AngleUnit = 'radians' | 'degrees';
+
+/**
  * Loading state for the model loader
  */
 export type LoadingState = 'idle' | 'loading' | 'loaded' | 'error';
