@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.1] - 2025-12-17
+
+### Fixed (1.6.1)
+
+- **Stable rotation numeric inputs when using degrees**: Added UI-friendly rotation values to the template context so native number steppers (and custom arrow controls) no longer exhibit “jumping” behavior caused by repeated degrees↔radians conversions.
+  - `ModelCropperUiContext` now exposes `rotationUnit` and `meshTransformUi` (rotation expressed in `rotationUnit` and rounded for display).
+  - Default UI now binds rotation inputs to `meshTransformUi.rotation`.
+  - Custom UIs can bind to `ctx.meshTransformUi.rotation` and call `ctx.setRotation(...)` without implementing a custom display-value helper.
+
 ## [1.6.0] - 2025-12-17
 
 ### Added (1.6.0)

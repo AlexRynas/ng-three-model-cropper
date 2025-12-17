@@ -3,7 +3,14 @@
  * This provides the host application with access to the cropper's state and actions
  */
 
-import { CropBoxConfig, MeshTransformConfig, LoadingState, LoadingProgress, Vec3 } from './types';
+import {
+  CropBoxConfig,
+  MeshTransformConfig,
+  LoadingState,
+  LoadingProgress,
+  Vec3,
+  AngleUnit,
+} from './types';
 
 /**
  * Context object passed to custom UI templates
@@ -12,7 +19,15 @@ import { CropBoxConfig, MeshTransformConfig, LoadingState, LoadingProgress, Vec3
 export interface ModelCropperUiContext {
   // State (readonly)
   readonly cropBox: CropBoxConfig;
+  /** Unit used by setRotation and meshTransformUi rotation values */
+  readonly rotationUnit: AngleUnit;
   readonly meshTransform: MeshTransformConfig;
+  /**
+   * UI-friendly transform values.
+   * - position is identical to meshTransform.position
+   * - rotation is expressed in rotationUnit (degrees/radians) and rounded for stable numeric inputs
+   */
+  readonly meshTransformUi: MeshTransformConfig;
   readonly loadingState: LoadingState;
   /** Detailed loading progress information */
   readonly loadingProgress: LoadingProgress;

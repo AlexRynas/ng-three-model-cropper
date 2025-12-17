@@ -140,32 +140,39 @@ export class CustomUiComponent {}
 
 ### UI Context API (`ModelCropperUiContext`)
 
-| Property/Method                       | Description                                          |
-| ------------------------------------- | ---------------------------------------------------- |
-| `cropBox`                             | Current crop box configuration                       |
-| `meshTransform`                       | Current position/rotation values                     |
-| `loadingState`                        | `'idle' \| 'loading' \| 'loaded' \| 'error'`         |
-| `loadingProgress`                     | Detailed loading progress information                |
-| `errorMessage`                        | Error message if any                                 |
-| `boxVisible`                          | Crop box visibility state                            |
-| `cropBoxColor`                        | Current crop box color (hex string)                  |
-| `gridVisible`                         | Grid helper visibility state                         |
-| `viewHelperVisible`                   | View helper visibility state                         |
-| `canApplyCrop`                        | Whether cropping is available (model loaded)         |
-| `canExport`                           | Whether export is available (crop applied and valid) |
-| `setCropBox(box)`                     | Set entire crop box                                  |
-| `setCropBoxValue(key, value)`         | Set single crop box value                            |
-| `setMeshTransform(transform)`         | Set entire transform                                 |
-| `setPosition(partial)`                | Update position values                               |
-| `setRotation(partial)`                | Update rotation values                               |
-| `toggleBoxVisibility(visible)`        | Show/hide crop box                                   |
-| `setCropBoxColor(color)`              | Set crop box color (hex string)                      |
-| `toggleGridVisibility(visible)`       | Show/hide grid helper                                |
-| `toggleViewHelperVisibility(visible)` | Show/hide view helper                                |
-| `applyCrop()`                         | Execute cropping                                     |
-| `download()`                          | Trigger export                                       |
-| `resetCropBox()`                      | Reset crop box to defaults                           |
-| `resetTransform()`                    | Reset transform to identity                          |
+| Property/Method               | Description                                                    |
+| ----------------------------- | -------------------------------------------------------------- |
+| `cropBox`                     | Current crop box configuration                                 |
+| `rotationUnit`                | Unit used for `setRotation` and `meshTransformUi`              |
+| `meshTransform`               | Current position/rotation values                               |
+| `meshTransformUi`             | Position + rotation values for UI (rotation in `rotationUnit`) |
+| `loadingState`                | `'idle' \| 'loading' \| 'loaded' \| 'error'`                   |
+| `loadingProgress`             | Detailed loading progress information                          |
+| `errorMessage`                | Error message if any                                           |
+| `boxVisible`                  | Crop box visibility state                                      |
+| `cropBoxColor`                | Current crop box color (hex string)                            |
+| `gridVisible`                 | Grid helper visibility state                                   |
+| `viewHelperVisible`           | View helper visibility state                                   |
+| `canApplyCrop`                | Whether cropping is available (model loaded)                   |
+| `canExport`                   | Whether export is available (crop applied and valid)           |
+| `setCropBox(box)`             | Set entire crop box                                            |
+| `setCropBoxValue(key, value)` | Set single crop box value                                      |
+| `setMeshTransform(transform)` | Set entire transform                                           |
+| `setPosition(partial)`        | Update position values                                         |
+| `setRotation(partial)`        | Update rotation values                                         |
+
+Notes:
+
+- `meshTransform.rotation` is stored internally in radians (Three.js native).
+- For numeric inputs (native steppers), prefer `meshTransformUi.rotation` so degrees/radians display stays stable and step-aligned.
+  | `toggleBoxVisibility(visible)` | Show/hide crop box |
+  | `setCropBoxColor(color)` | Set crop box color (hex string) |
+  | `toggleGridVisibility(visible)` | Show/hide grid helper |
+  | `toggleViewHelperVisibility(visible)` | Show/hide view helper |
+  | `applyCrop()` | Execute cropping |
+  | `download()` | Trigger export |
+  | `resetCropBox()` | Reset crop box to defaults |
+  | `resetTransform()` | Reset transform to identity |
 
 ## Using with MatDialog
 

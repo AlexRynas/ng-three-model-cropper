@@ -356,8 +356,7 @@ describe('ModelCropperComponent', () => {
       expect(lastCall.args[3]).toBe('degrees');
     });
 
-    it('getRotationDisplayValue returns raw radians when unit is radians', () => {
-      // set a known rotation in the mocked service (radians)
+    it('meshTransformUi returns raw radians when unit is radians', () => {
       (mockService.meshTransform as unknown as ReturnType<typeof signal>).set({
         position: { x: 0, y: 0, z: 0 },
         rotation: { x: 1.2345, y: 0, z: 0 },
@@ -366,22 +365,24 @@ describe('ModelCropperComponent', () => {
       fixture.componentRef.setInput('rotationUnit', 'radians');
       fixture.detectChanges();
 
-      const val = component.getRotationDisplayValue('x');
-      expect(val).toBeCloseTo(1.2345, 4);
+      const transformUi = component.meshTransformUi();
+      expect(transformUi.rotation.x).toBeCloseTo(1.2345, 4);
     });
 
-    it('getRotationDisplayValue converts to degrees when unit is degrees', () => {
-      // set a known rotation in the mocked service (radians)
-      (mockService.meshTransform as unknown as ReturnType<typeof signal>).set({
+    it('meshTransformUi converts to degrees when unit is degrees', () => {
+      const radiansTransform: MeshTransformConfig = {
         position: { x: 0, y: 0, z: 0 },
         rotation: { x: 0, y: Math.PI / 2, z: 0 },
-      } as MeshTransformConfig);
+      };
+      (mockService.meshTransform as unknown as ReturnType<typeof signal>).set(radiansTransform);
 
       fixture.componentRef.setInput('rotationUnit', 'degrees');
       fixture.detectChanges();
 
-      const val = component.getRotationDisplayValue('y');
-      expect(val).toBeCloseTo(90, 2);
+      const transformUi = component.meshTransformUi();
+      expect(transformUi.rotation.y).toBeCloseTo(90, 2);
+      // ensure original service transform remains radians
+      expect(mockService.meshTransform().rotation.y).toBeCloseTo(Math.PI / 2, 6);
     });
   });
 
@@ -417,7 +418,9 @@ describe('ModelCropperComponent', () => {
       const context = component.uiContext();
 
       expect(context.cropBox).toBeDefined();
+      expect(context.rotationUnit).toBeDefined();
       expect(context.meshTransform).toBeDefined();
+      expect(context.meshTransformUi).toBeDefined();
       expect(context.loadingState).toBeDefined();
       expect(context.errorMessage).toBeDefined();
       expect(context.boxVisible).toBeDefined();
@@ -538,14 +541,14 @@ describe('ModelCropperComponent', () => {
 
     describe('onRotationChange', () => {
       it('should update rotation', () => {
-        const event = { target: { value: '1.57' } } as unknown as Event;
+        const event = { target: { valueAsNumber: 1.57 } } as unknown as Event;
         component.onRotationChange('y', event);
 
         expect(mockService.updateRotation).toHaveBeenCalledWith({ y: 1.57 });
       });
 
       it('should ignore NaN values', () => {
-        const event = { target: { value: 'invalid' } } as unknown as Event;
+        const event = { target: { valueAsNumber: NaN } } as unknown as Event;
         component.onRotationChange('y', event);
 
         expect(mockService.updateRotation).not.toHaveBeenCalled();

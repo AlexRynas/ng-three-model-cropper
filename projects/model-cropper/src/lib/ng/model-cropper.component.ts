@@ -103,10 +103,35 @@ export class ModelCropperComponent implements OnInit, AfterViewInit, OnDestroy {
     ...this.labelsConfig(),
   }));
 
+  /**
+   * UI-friendly mesh transform.
+   * Rotation is converted to the selected rotationUnit and rounded so numeric inputs remain stable
+   * (e.g. native stepper arrows won't fight floating point conversions).
+   */
+  readonly meshTransformUi: Signal<MeshTransformConfig> = computed(() => {
+    const transform = this.service.meshTransform();
+    const unit = this.rotationUnit();
+
+    if (unit !== 'degrees') {
+      return transform;
+    }
+
+    return {
+      ...transform,
+      rotation: {
+        x: this.roundNumber(this.radiansToDegrees(transform.rotation.x), 2),
+        y: this.roundNumber(this.radiansToDegrees(transform.rotation.y), 2),
+        z: this.roundNumber(this.radiansToDegrees(transform.rotation.z), 2),
+      },
+    };
+  });
+
   // UI Context for template customization
   readonly uiContext: Signal<ModelCropperUiContext> = computed(() => ({
     cropBox: this.service.cropBox(),
+    rotationUnit: this.rotationUnit(),
     meshTransform: this.service.meshTransform(),
+    meshTransformUi: this.meshTransformUi(),
     loadingState: this.service.loadingState(),
     loadingProgress: this.service.loadingProgress(),
     errorMessage: this.service.errorMessage(),
@@ -221,19 +246,15 @@ export class ModelCropperComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onRotationChange(axis: 'x' | 'y' | 'z', event: Event): void {
-    const value = parseFloat((event.target as HTMLInputElement).value);
-    if (!isNaN(value)) {
+    const input = event.target as HTMLInputElement;
+    const value = input.valueAsNumber;
+    if (Number.isFinite(value)) {
       this.service.updateRotation({ [axis]: value });
     }
   }
 
-  getRotationDisplayValue(axis: 'x' | 'y' | 'z'): number {
-    const rotation = this.service.meshTransform().rotation;
-    const unit = this.rotationUnit();
-    if (unit === 'degrees') {
-      return this.roundNumber((rotation[axis] * 180) / Math.PI);
-    }
-    return rotation[axis];
+  private radiansToDegrees(radians: number): number {
+    return (radians * 180) / Math.PI;
   }
 
   /**

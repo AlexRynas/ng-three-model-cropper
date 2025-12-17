@@ -168,7 +168,7 @@
                   id="ntmc-posX"
                   type="number"
                   step="0.1"
-                  [value]="service.meshTransform().position.x"
+                  [value]="meshTransformUi().position.x"
                   (input)="onPositionChange('x', $event)"
                 />
               </div>
@@ -178,7 +178,7 @@
                   id="ntmc-posY"
                   type="number"
                   step="0.1"
-                  [value]="service.meshTransform().position.y"
+                  [value]="meshTransformUi().position.y"
                   (input)="onPositionChange('y', $event)"
                 />
               </div>
@@ -188,7 +188,7 @@
                   id="ntmc-posZ"
                   type="number"
                   step="0.1"
-                  [value]="service.meshTransform().position.z"
+                  [value]="meshTransformUi().position.z"
                   (input)="onPositionChange('z', $event)"
                 />
               </div>
@@ -205,7 +205,7 @@
                   id="ntmc-rotX"
                   type="number"
                   step="0.1"
-                  [value]="getRotationDisplayValue('x')"
+                  [value]="meshTransformUi().rotation.x"
                   (input)="onRotationChange('x', $event)"
                 />
               </div>
@@ -215,7 +215,7 @@
                   id="ntmc-rotY"
                   type="number"
                   step="0.1"
-                  [value]="getRotationDisplayValue('y')"
+                  [value]="meshTransformUi().rotation.y"
                   (input)="onRotationChange('y', $event)"
                 />
               </div>
@@ -225,7 +225,7 @@
                   id="ntmc-rotZ"
                   type="number"
                   step="0.1"
-                  [value]="getRotationDisplayValue('z')"
+                  [value]="meshTransformUi().rotation.z"
                   (input)="onRotationChange('z', $event)"
                 />
               </div>

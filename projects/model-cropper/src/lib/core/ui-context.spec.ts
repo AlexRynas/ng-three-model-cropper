@@ -3,7 +3,13 @@
  */
 
 import { ModelCropperUiContext, ModelCropperLabels, DEFAULT_LABELS } from './ui-context';
-import { CropBoxConfig, MeshTransformConfig, LoadingState, LoadingProgress } from './types';
+import {
+  CropBoxConfig,
+  MeshTransformConfig,
+  LoadingState,
+  LoadingProgress,
+  AngleUnit,
+} from './types';
 
 describe('ui-context', () => {
   describe('DEFAULT_LABELS', () => {
@@ -140,7 +146,9 @@ describe('ui-context', () => {
       const mockContext: ModelCropperUiContext = {
         // State
         cropBox: mockCropBox,
+        rotationUnit: 'radians',
         meshTransform: mockTransform,
+        meshTransformUi: mockTransform,
         loadingState: 'idle',
         loadingProgress: {
           state: 'idle',
@@ -175,7 +183,9 @@ describe('ui-context', () => {
 
       // Verify state properties
       expect(mockContext.cropBox).toEqual(mockCropBox);
+      expect(mockContext.rotationUnit).toBe('radians');
       expect(mockContext.meshTransform).toEqual(mockTransform);
+      expect(mockContext.meshTransformUi).toEqual(mockTransform);
       expect(mockContext.loadingState).toBe('idle');
       expect(mockContext.errorMessage).toBeNull();
       expect(mockContext.boxVisible).toBe(true);
@@ -366,7 +376,9 @@ describe('ui-context', () => {
 function createMockUiContext(
   overrides: Partial<{
     cropBox: CropBoxConfig;
+    rotationUnit: AngleUnit;
     meshTransform: MeshTransformConfig;
+    meshTransformUi: MeshTransformConfig;
     loadingState: LoadingState;
     loadingProgress: LoadingProgress;
     errorMessage: string | null;
@@ -394,7 +406,9 @@ function createMockUiContext(
 
   return {
     cropBox: overrides.cropBox ?? defaultCropBox,
+    rotationUnit: overrides.rotationUnit ?? 'radians',
     meshTransform: overrides.meshTransform ?? defaultTransform,
+    meshTransformUi: overrides.meshTransformUi ?? overrides.meshTransform ?? defaultTransform,
     loadingState: overrides.loadingState ?? 'idle',
     loadingProgress: overrides.loadingProgress ?? {
       state: 'idle',
