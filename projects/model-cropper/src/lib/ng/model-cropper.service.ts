@@ -52,6 +52,7 @@ export class ModelCropperService {
   private readonly _cropBoxColor: WritableSignal<string> = signal('#00ff00');
   private readonly _gridVisible: WritableSignal<boolean> = signal(false);
   private readonly _viewHelperVisible: WritableSignal<boolean> = signal(false);
+  private readonly _sceneBackgroundColor: WritableSignal<string> = signal('#2a2a2a');
   private readonly _lastCropResult: WritableSignal<CropResult | null> = signal(null);
   private readonly _cropIsValid: WritableSignal<boolean> = signal(false);
   private readonly _rotationUnit: WritableSignal<AngleUnit> = signal('radians');
@@ -62,7 +63,12 @@ export class ModelCropperService {
   setInitialValues(
     cropBox?: CropBoxConfig,
     transform?: MeshTransformConfig,
-    visualOptions?: { cropBoxColor?: string; showGrid?: boolean; showViewHelper?: boolean },
+    visualOptions?: {
+      cropBoxColor?: string;
+      showGrid?: boolean;
+      showViewHelper?: boolean;
+      sceneBackgroundColor?: string;
+    },
     rotationUnit?: AngleUnit
   ): void {
     if (cropBox) {
@@ -83,6 +89,9 @@ export class ModelCropperService {
     if (rotationUnit) {
       this._rotationUnit.set(rotationUnit);
     }
+    if (visualOptions?.sceneBackgroundColor) {
+      this._sceneBackgroundColor.set(visualOptions.sceneBackgroundColor);
+    }
   }
 
   // Public readonly signals
@@ -95,6 +104,7 @@ export class ModelCropperService {
   readonly cropBoxColor: Signal<string> = this._cropBoxColor.asReadonly();
   readonly gridVisible: Signal<boolean> = this._gridVisible.asReadonly();
   readonly viewHelperVisible: Signal<boolean> = this._viewHelperVisible.asReadonly();
+  readonly sceneBackgroundColor: Signal<string> = this._sceneBackgroundColor.asReadonly();
   readonly lastCropResult: Signal<CropResult | null> = this._lastCropResult.asReadonly();
 
   // Computed signals
@@ -152,6 +162,15 @@ export class ModelCropperService {
     this.engine.setCropBoxColor(this._cropBoxColor());
     this.engine.setGridVisibility(this._gridVisible());
     this.engine.setViewHelperVisibility(this._viewHelperVisible());
+    this.engine.setSceneBackgroundColor(this._sceneBackgroundColor());
+  }
+
+  /**
+   * Update scene background color (accepts any CSS color string, including rgba/hex with alpha)
+   */
+  setSceneBackgroundColor(color: string): void {
+    this._sceneBackgroundColor.set(color);
+    this.engine?.setSceneBackgroundColor(color);
   }
 
   /**
@@ -427,6 +446,7 @@ export class ModelCropperService {
     this._cropBoxColor.set('#00ff00');
     this._gridVisible.set(false);
     this._viewHelperVisible.set(false);
+    this._sceneBackgroundColor.set('#2a2a2a');
     this._lastCropResult.set(null);
     this._cropIsValid.set(false);
   }

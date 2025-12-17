@@ -72,6 +72,8 @@ export class ModelCropperComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly cropBoxColor = input<string>('#00ff00');
   readonly showGrid = input<boolean>(false);
   readonly showViewHelper = input<boolean>(false);
+  /** CSS color for scene background (supports transparency) */
+  readonly sceneBackgroundColor = input<string>('#2a2a2a');
   /** Whether to show the loading overlay with spinner (default: true) */
   readonly showLoadingOverlay = input<boolean>(true);
   /** Whether to show the error overlay (default: true) */
@@ -153,6 +155,7 @@ export class ModelCropperComponent implements OnInit, AfterViewInit, OnDestroy {
         cropBoxColor: this.cropBoxColor(),
         showGrid: this.showGrid(),
         showViewHelper: this.showViewHelper(),
+        sceneBackgroundColor: this.sceneBackgroundColor(),
       },
       rotationUnit
     );

@@ -459,6 +459,19 @@ describe('ModelCropEngine', () => {
       expect(engine).toBeDefined();
     });
 
+    it('should accept CSS colors and alpha for scene background', () => {
+      // Semi-transparent color should keep scene.background null (renderer alpha used)
+      engine.setSceneBackgroundColor('rgba(255,0,0,0.5)');
+      const scene = (engine as unknown as { scene: THREE.Scene }).scene;
+      expect(scene.background).toBeNull();
+
+      // Fully opaque hex should set scene.background to a THREE.Color
+      engine.setSceneBackgroundColor('#00ff00');
+      expect((engine as unknown as { scene: THREE.Scene }).scene.background).toBeInstanceOf(
+        THREE.Color
+      );
+    });
+
     it('should add lighting to scene', () => {
       // Lighting is added in constructor
       expect(engine).toBeDefined();

@@ -205,6 +205,73 @@ export class ModelCropEngine {
   }
 
   /**
+   * Set scene background color. Accepts CSS color strings (hex, rgb(a), rgba, named colors).
+   * If the color has transparency (alpha < 1), the scene background is kept null so the
+   * canvas can be rendered with transparency; the renderer clear color's alpha is set
+   * so compositing works as expected.
+   */
+  setSceneBackgroundColor(color: string): void {
+    const parsed = this.parseCssColor(color);
+    this.renderer.setClearColor(parsed.color.getHex(), parsed.alpha);
+    if (parsed.alpha < 1) {
+      // Keep scene.background null to allow renderer alpha transparency
+      this.scene.background = null;
+    } else {
+      // When fully opaque, set scene.background to the color for potential postprocessing
+      this.scene.background = parsed.color;
+    }
+  }
+
+  /**
+   * Parse simple CSS color strings into a THREE.Color and alpha value.
+   * Supports: hex (#RGB, #RRGGBB, #RRGGBBAA), rgb(...), rgba(...), and named colors.
+   */
+  private parseCssColor(input: string): { color: THREE.Color; alpha: number } {
+    const s = (input || '').trim();
+
+    // rgba(...) or rgb(...)
+    const rgbaMatch = s.match(
+      /rgba?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*([0-9.]+))?\s*\)/i
+    );
+    if (rgbaMatch) {
+      const r = Math.min(255, parseInt(rgbaMatch[1], 10));
+      const g = Math.min(255, parseInt(rgbaMatch[2], 10));
+      const b = Math.min(255, parseInt(rgbaMatch[3], 10));
+      const a = rgbaMatch[4] !== undefined ? Math.max(0, Math.min(1, parseFloat(rgbaMatch[4]))) : 1;
+      return { color: new THREE.Color(r / 255, g / 255, b / 255), alpha: a };
+    }
+
+    // Hex formats: #RRGGBB, #RGB, #RRGGBBAA
+    if (s.startsWith('#')) {
+      const hex = s.slice(1);
+      if (/^[0-9a-fA-F]{8}$/.test(hex)) {
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        const a = parseInt(hex.slice(6, 8), 16) / 255;
+        return { color: new THREE.Color(r / 255, g / 255, b / 255), alpha: a };
+      }
+      if (/^[0-9a-fA-F]{6}$/.test(hex)) {
+        return { color: new THREE.Color('#' + hex), alpha: 1 };
+      }
+      if (/^[0-9a-fA-F]{3}$/.test(hex)) {
+        const r = parseInt(hex[0] + hex[0], 16);
+        const g = parseInt(hex[1] + hex[1], 16);
+        const b = parseInt(hex[2] + hex[2], 16);
+        return { color: new THREE.Color(r / 255, g / 255, b / 255), alpha: 1 };
+      }
+    }
+
+    // Fallback: let THREE try to parse named colors and other formats; alpha = 1
+    try {
+      const c = new THREE.Color(s || '#000000');
+      return { color: c, alpha: 1 };
+    } catch {
+      return { color: new THREE.Color(0x000000), alpha: 1 };
+    }
+  }
+
+  /**
    * Setup scene lighting
    */
   private setupLighting(): void {

@@ -70,6 +70,10 @@ describe('ModelCropperService', () => {
       expect(service.cropBoxColor()).toBe('#00ff00');
     });
 
+    it('should have #2a2a2a scene background color by default', () => {
+      expect(service.sceneBackgroundColor()).toBe('#2a2a2a');
+    });
+
     it('should have grid hidden by default', () => {
       expect(service.gridVisible()).toBe(false);
     });
@@ -157,6 +161,11 @@ describe('ModelCropperService', () => {
       expect(service.viewHelperVisible()).toBe(true);
     });
 
+    it('should accept sceneBackgroundColor in visual options', () => {
+      service.setInitialValues(undefined, undefined, { sceneBackgroundColor: '#112233' });
+      expect(service.sceneBackgroundColor()).toBe('#112233');
+    });
+
     it('should round crop box values', () => {
       const preciseBox: CropBoxConfig = {
         minX: -1.234567,
@@ -196,6 +205,14 @@ describe('ModelCropperService', () => {
 
       const rounded = Math.round(service.meshTransform().rotation.y * 100) / 100;
       expect(rounded).toBe(3.14);
+    });
+  });
+
+  describe('Scene background API', () => {
+    it('should set scene background color via setter without engine safely', () => {
+      // Engine not initialized - should not throw
+      expect(() => service.setSceneBackgroundColor('#445566')).not.toThrow();
+      expect(service.sceneBackgroundColor()).toBe('#445566');
     });
   });
   describe('initViewport', () => {

@@ -276,6 +276,18 @@ describe('ModelCropperComponent', () => {
       expect(component.showViewHelper()).toBe(true);
     });
 
+    it('should accept sceneBackgroundColor input and pass to service', () => {
+      fixture.componentRef.setInput('sceneBackgroundColor', 'rgba(17,34,51,0.5)');
+      fixture.detectChanges();
+
+      expect(component.sceneBackgroundColor()).toBe('rgba(17,34,51,0.5)');
+
+      const lastCall = (mockService.setInitialValues as jasmine.Spy).calls.mostRecent();
+      expect(lastCall).toBeDefined();
+      // visual options are passed as the third argument
+      expect(lastCall.args[2].sceneBackgroundColor).toBe('rgba(17,34,51,0.5)');
+    });
+
     it('should accept labelsConfig input', () => {
       const customLabels = { applyCropLabel: 'Crop It!' };
       fixture.componentRef.setInput('labelsConfig', customLabels);

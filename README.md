@@ -84,23 +84,24 @@ export class ModelEditorComponent {
 
 ### Inputs
 
-| Input                 | Type                          | Default               | Description                                                 |
-| --------------------- | ----------------------------- | --------------------- | ----------------------------------------------------------- |
-| `srcUrl`              | `string`                      | **required**          | URL to the 3D model file (GLB/GLTF/FBX)                     |
-| `initialCropBox`      | `CropBoxConfig`               | auto-calculated       | Initial crop box bounds                                     |
-| `initialTransform`    | `MeshTransformConfig`         | identity              | Initial position/rotation                                   |
-| `rotationUnit`        | `'radians' \| 'degrees'`      | `'radians'`           | Unit for rotation values passed to setRotation (UI context) |
-| `downloadMode`        | `'download' \| 'emit'`        | `'download'`          | Export behavior                                             |
-| `filename`            | `string`                      | `'cropped-model.glb'` | Download filename                                           |
-| `cropBoxColor`        | `string`                      | `'#00ff00'`           | Hex color for crop box visualization                        |
-| `showGrid`            | `boolean`                     | `false`               | Show grid helper in the scene                               |
-| `showViewHelper`      | `boolean`                     | `false`               | Show view helper (axis indicator)                           |
-| `showLoadingOverlay`  | `boolean`                     | `true`                | Show the loading overlay with spinner                       |
-| `showErrorOverlay`    | `boolean`                     | `true`                | Show the error overlay                                      |
-| `showLoadingProgress` | `boolean`                     | `true`                | Show loading progress percentage                            |
-| `spinnerColor`        | `string`                      | `'#4caf50'`           | Hex color for the loading spinner                           |
-| `uiTemplate`          | `TemplateRef`                 | -                     | Custom UI template                                          |
-| `labelsConfig`        | `Partial<ModelCropperLabels>` | defaults              | UI label overrides                                          |
+| Input                  | Type                          | Default               | Description                                                                                |
+| ---------------------- | ----------------------------- | --------------------- | ------------------------------------------------------------------------------------------ |
+| `srcUrl`               | `string`                      | **required**          | URL to the 3D model file (GLB/GLTF/FBX)                                                    |
+| `initialCropBox`       | `CropBoxConfig`               | auto-calculated       | Initial crop box bounds                                                                    |
+| `initialTransform`     | `MeshTransformConfig`         | identity              | Initial position/rotation                                                                  |
+| `rotationUnit`         | `'radians' \| 'degrees'`      | `'radians'`           | Unit for rotation values passed to setRotation (UI context)                                |
+| `downloadMode`         | `'download' \| 'emit'`        | `'download'`          | Export behavior                                                                            |
+| `filename`             | `string`                      | `'cropped-model.glb'` | Download filename                                                                          |
+| `cropBoxColor`         | `string`                      | `'#00ff00'`           | Hex color for crop box visualization                                                       |
+| `showGrid`             | `boolean`                     | `false`               | Show grid helper in the scene                                                              |
+| `showViewHelper`       | `boolean`                     | `false`               | Show view helper (axis indicator)                                                          |
+| `sceneBackgroundColor` | `string`                      | `'#2a2a2a'`           | CSS color for scene background; supports transparency (rgba, hex with alpha, named colors) |
+| `showLoadingOverlay`   | `boolean`                     | `true`                | Show the loading overlay with spinner                                                      |
+| `showErrorOverlay`     | `boolean`                     | `true`                | Show the error overlay                                                                     |
+| `showLoadingProgress`  | `boolean`                     | `true`                | Show loading progress percentage                                                           |
+| `spinnerColor`         | `string`                      | `'#4caf50'`           | Hex color for the loading spinner                                                          |
+| `uiTemplate`           | `TemplateRef`                 | -                     | Custom UI template                                                                         |
+| `labelsConfig`         | `Partial<ModelCropperLabels>` | defaults              | UI label overrides                                                                         |
 
 ### Outputs
 

@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
   - New `AngleUnit` type: `'radians' | 'degrees'`.
   - New `rotationUnit` input on the component to control the unit for rotation values.
   - The `setRotation` function continues to accept only a single argument (the rotation value). To specify the unit (radians or degrees), use the `rotationUnit` input.
+- **Scene Background Color**: Added `sceneBackgroundColor` input to control the 3D scene background color. Accepts any CSS color string (hex, rgb/rgba, named colors) and supports transparency (alpha).
 
 ### Changed (1.6.0)
 
