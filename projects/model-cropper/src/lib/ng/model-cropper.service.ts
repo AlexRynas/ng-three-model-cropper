@@ -373,8 +373,9 @@ export class ModelCropperService {
   /**
    * Round a numeric value to at most two decimal places
    */
-  private roundNumber(value: number): number {
-    return Math.round(value * 100) / 100;
+  private roundNumber(value: number, decimals = 2): number {
+    const factor = Math.pow(10, decimals);
+    return Math.round(value * factor) / factor;
   }
 
   /**
@@ -402,9 +403,11 @@ export class ModelCropperService {
         z: this.roundNumber(transform.position.z),
       },
       rotation: {
-        x: this.roundNumber(transform.rotation.x),
-        y: this.roundNumber(transform.rotation.y),
-        z: this.roundNumber(transform.rotation.z),
+        // Keep higher precision for rotations (stored in radians) so
+        // small increments (e.g. when using degrees in the UI) aren't lost.
+        x: this.roundNumber(transform.rotation.x, 4),
+        y: this.roundNumber(transform.rotation.y, 4),
+        z: this.roundNumber(transform.rotation.z, 4),
       },
     };
   }

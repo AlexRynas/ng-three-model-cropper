@@ -355,6 +355,34 @@ describe('ModelCropperComponent', () => {
       expect(lastCall).toBeDefined();
       expect(lastCall.args[3]).toBe('degrees');
     });
+
+    it('getRotationDisplayValue returns raw radians when unit is radians', () => {
+      // set a known rotation in the mocked service (radians)
+      (mockService.meshTransform as unknown as ReturnType<typeof signal>).set({
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 1.2345, y: 0, z: 0 },
+      } as MeshTransformConfig);
+
+      fixture.componentRef.setInput('rotationUnit', 'radians');
+      fixture.detectChanges();
+
+      const val = component.getRotationDisplayValue('x');
+      expect(val).toBeCloseTo(1.2345, 4);
+    });
+
+    it('getRotationDisplayValue converts to degrees when unit is degrees', () => {
+      // set a known rotation in the mocked service (radians)
+      (mockService.meshTransform as unknown as ReturnType<typeof signal>).set({
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: Math.PI / 2, z: 0 },
+      } as MeshTransformConfig);
+
+      fixture.componentRef.setInput('rotationUnit', 'degrees');
+      fixture.detectChanges();
+
+      const val = component.getRotationDisplayValue('y');
+      expect(val).toBeCloseTo(90, 2);
+    });
   });
 
   describe('Labels', () => {

@@ -193,7 +193,8 @@ describe('ModelCropperService', () => {
 
       const transform = service.meshTransform();
       expect(transform.position.x).toBe(1.23);
-      expect(transform.rotation.z).toBe(0.35);
+      // rotation rounding now preserves higher precision (4 decimals)
+      expect(transform.rotation.z).toBe(0.3457);
     });
 
     it('should accept rotationUnit and convert degrees to radians on update', () => {

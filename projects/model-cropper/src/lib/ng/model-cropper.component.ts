@@ -227,6 +227,23 @@ export class ModelCropperComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  getRotationDisplayValue(axis: 'x' | 'y' | 'z'): number {
+    const rotation = this.service.meshTransform().rotation;
+    const unit = this.rotationUnit();
+    if (unit === 'degrees') {
+      return this.roundNumber((rotation[axis] * 180) / Math.PI);
+    }
+    return rotation[axis];
+  }
+
+  /**
+   * Round a numeric value to at most two decimal places
+   */
+  private roundNumber(value: number, decimals = 2): number {
+    const factor = Math.pow(10, decimals);
+    return Math.round(value * factor) / factor;
+  }
+
   onApplyCrop(): void {
     const result = this.service.applyCrop();
     this.cropApplied.emit(result);
